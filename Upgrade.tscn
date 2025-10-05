@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3 uid="uid://b5a2h1nfm8k8v"]
+
+[ext_resource type="Script" uid="uid://vmag8ie6o6eb" path="res://upgrade.gd" id="1_g2cgu"]
+[ext_resource type="AudioStream" uid="uid://chy1l4psu6nm0" path="res://Assets/Sounds/impactBell_heavy_000.ogg" id="2_6w8xc"]
+[ext_resource type="FontFile" uid="uid://7iuc2vwyu776" path="res://Assets/Fonts/ClearSans-Regular.ttf" id="3_a4xni"]
+[ext_resource type="FontFile" uid="uid://dkv8lgccwfjc4" path="res://Assets/Fonts/ClearSans-Light.ttf" id="4_a0bff"]
+
+[node name="Upgrade" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_g2cgu")
+
+[node name="PurchaseSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_6w8xc")
+
+[node name="IconButton" type="TextureButton" parent="."]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 3
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_a4xni")
+theme_override_font_sizes/font_size = 12
+text = "Upgrade"
+horizontal_alignment = 1
+
+[node name="InfoLabel" type="Label" parent="."]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_a0bff")
+theme_override_font_sizes/font_size = 10
+text = "
+Cost: 0, Level: 0"
+horizontal_alignment = 1

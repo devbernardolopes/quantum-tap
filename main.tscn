@@ -1,0 +1,540 @@
+[gd_scene load_steps=96 format=3 uid="uid://cyq7iemom75wj"]
+
+[ext_resource type="Script" uid="uid://bs6o0rxqsqxcg" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://b5oe5hgj2uymx" path="res://addons/AdmobPlugin/Admob.gd" id="2_0xm2m"]
+[ext_resource type="AudioStream" uid="uid://dsef6olbqb81e" path="res://Assets/Sounds/impactGlass_heavy_003.ogg" id="3_5vw27"]
+[ext_resource type="Texture2D" uid="uid://uw4s7cvuuqw4" path="res://Assets/Images/UI/play-button.png" id="4_kek77"]
+[ext_resource type="Texture2D" uid="uid://cah45jxeb7ero" path="res://Assets/Images/Quantum Core.png" id="5_kek77"]
+[ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
+[ext_resource type="PackedScene" uid="uid://b5a2h1nfm8k8v" path="res://Upgrade.tscn" id="7_272bh"]
+[ext_resource type="Texture2D" uid="uid://b4j031cciwjif" path="res://Assets/Images/Upgrades/Particle Accelerator 2.png" id="7_kek77"]
+[ext_resource type="Texture2D" uid="uid://bx2nopw20ksg8" path="res://Assets/Images/Upgrades/Quantum Stabilizer 2.png" id="8_kek77"]
+[ext_resource type="Texture2D" uid="uid://cm85uhkhkcbp1" path="res://Assets/Images/Upgrades/Dimensional Shift.png" id="9_4c57u"]
+[ext_resource type="Texture2D" uid="uid://bdvwpv45rx3wl" path="res://Assets/Images/Quantum Core/frame_0001.png" id="10_yysqy"]
+[ext_resource type="Texture2D" uid="uid://bkyc1ll4yhq0g" path="res://Assets/Images/Quantum Core/frame_0002.png" id="11_n5t1e"]
+[ext_resource type="Texture2D" uid="uid://bc765r8qnl8lm" path="res://Assets/Images/Quantum Core/frame_0003.png" id="12_h6isl"]
+[ext_resource type="Texture2D" uid="uid://wp0f2pucfyr5" path="res://Assets/Images/Quantum Core/frame_0004.png" id="13_53bls"]
+[ext_resource type="Texture2D" uid="uid://bgd6l2edrcgvi" path="res://Assets/Images/Quantum Core/frame_0005.png" id="14_lwnsi"]
+[ext_resource type="Texture2D" uid="uid://2d0pjkp6nlj4" path="res://Assets/Images/Quantum Core/frame_0006.png" id="15_41lik"]
+[ext_resource type="Texture2D" uid="uid://dq3pc2ekqmlbd" path="res://Assets/Images/Quantum Core/frame_0007.png" id="16_jbvwl"]
+[ext_resource type="Texture2D" uid="uid://3dcjvpfqgnip" path="res://Assets/Images/Quantum Core/frame_0008.png" id="17_sn1fb"]
+[ext_resource type="Texture2D" uid="uid://dhiykmtpdm0ok" path="res://Assets/Images/Quantum Core/frame_0009.png" id="18_yvsr8"]
+[ext_resource type="Texture2D" uid="uid://c7bxpwbqyt5ta" path="res://Assets/Images/Quantum Core/frame_0010.png" id="19_vieuh"]
+[ext_resource type="Texture2D" uid="uid://dbadthrmsfa7y" path="res://Assets/Images/Quantum Core/frame_0011.png" id="20_yjja3"]
+[ext_resource type="Texture2D" uid="uid://b2u7u50wcx7lh" path="res://Assets/Images/Quantum Core/frame_0012.png" id="21_l0gw7"]
+[ext_resource type="Texture2D" uid="uid://b7ffsoilg2fab" path="res://Assets/Images/Quantum Core/frame_0013.png" id="22_inymm"]
+[ext_resource type="Texture2D" uid="uid://cib2wj5db777h" path="res://Assets/Images/Quantum Core/frame_0014.png" id="23_jcxqu"]
+[ext_resource type="Texture2D" uid="uid://cd616ldekmio1" path="res://Assets/Images/Quantum Core/frame_0015.png" id="24_0arob"]
+[ext_resource type="Texture2D" uid="uid://sk0jq1d0lnbv" path="res://Assets/Images/Quantum Core/frame_0016.png" id="25_dij0e"]
+[ext_resource type="Texture2D" uid="uid://ccr6fl6jau0b2" path="res://Assets/Images/Quantum Core/frame_0017.png" id="26_k1udn"]
+[ext_resource type="Texture2D" uid="uid://bmdder6tnhqlo" path="res://Assets/Images/Quantum Core/frame_0018.png" id="27_wat4s"]
+[ext_resource type="Texture2D" uid="uid://cxr81r73qis6q" path="res://Assets/Images/Quantum Core/frame_0019.png" id="28_ywjan"]
+[ext_resource type="Texture2D" uid="uid://bihagt3uwkfnw" path="res://Assets/Images/Quantum Core/frame_0020.png" id="29_m74q3"]
+[ext_resource type="Texture2D" uid="uid://u0vr0mm801ur" path="res://Assets/Images/Quantum Core/frame_0021.png" id="30_tko6h"]
+[ext_resource type="Texture2D" uid="uid://r1jsa4m2232m" path="res://Assets/Images/Quantum Core/frame_0022.png" id="31_am8a1"]
+[ext_resource type="Texture2D" uid="uid://dxd1jlvy2lixa" path="res://Assets/Images/Quantum Core/frame_0023.png" id="32_8dc3g"]
+[ext_resource type="Texture2D" uid="uid://dxeef83q8l2yc" path="res://Assets/Images/Quantum Core/frame_0024.png" id="33_htgcl"]
+[ext_resource type="Texture2D" uid="uid://dl31ewfemg7ol" path="res://Assets/Images/Quantum Core/frame_0025.png" id="34_smeu8"]
+[ext_resource type="Texture2D" uid="uid://dj817s8muhs0" path="res://Assets/Images/Quantum Core/frame_0026.png" id="35_f3y11"]
+[ext_resource type="Texture2D" uid="uid://ctqb1syiuj5op" path="res://Assets/Images/Quantum Core/frame_0027.png" id="36_cpm2s"]
+[ext_resource type="Texture2D" uid="uid://dje12t3i1rsdp" path="res://Assets/Images/Quantum Core/frame_0028.png" id="37_u81y6"]
+[ext_resource type="Texture2D" uid="uid://d4h8b35a2iq5a" path="res://Assets/Images/Quantum Core/frame_0029.png" id="38_rt5wr"]
+[ext_resource type="Texture2D" uid="uid://cpo572akfiusg" path="res://Assets/Images/Quantum Core/frame_0030.png" id="39_mnw77"]
+[ext_resource type="Texture2D" uid="uid://83hswqkoqlen" path="res://Assets/Images/Quantum Core/frame_0031.png" id="40_vjgyh"]
+[ext_resource type="Texture2D" uid="uid://vbpgs2mjtois" path="res://Assets/Images/Quantum Core/frame_0032.png" id="41_d5iia"]
+[ext_resource type="Texture2D" uid="uid://c7lhujwel1ro4" path="res://Assets/Images/Quantum Core/frame_0033.png" id="42_asu84"]
+[ext_resource type="Texture2D" uid="uid://yhclrwiq6sni" path="res://Assets/Images/Quantum Core/frame_0034.png" id="43_qwt6e"]
+[ext_resource type="Texture2D" uid="uid://cem2jad6f38mb" path="res://Assets/Images/Quantum Core/frame_0035.png" id="44_off2o"]
+[ext_resource type="Texture2D" uid="uid://cfv7ocvepdu0h" path="res://Assets/Images/Quantum Core/frame_0036.png" id="45_tttfs"]
+[ext_resource type="Texture2D" uid="uid://c7hur84k2comf" path="res://Assets/Images/Quantum Core/frame_0037.png" id="46_1iygd"]
+[ext_resource type="Texture2D" uid="uid://dxaypu3aw7q8m" path="res://Assets/Images/Quantum Core/frame_0038.png" id="47_g5xqc"]
+[ext_resource type="Texture2D" uid="uid://crmi7rrslkngk" path="res://Assets/Images/Quantum Core/frame_0039.png" id="48_s4o1y"]
+[ext_resource type="Texture2D" uid="uid://divjm0eh4cig8" path="res://Assets/Images/Quantum Core/frame_0040.png" id="49_7mmqq"]
+[ext_resource type="Texture2D" uid="uid://b2fq4fekc7ing" path="res://Assets/Images/Quantum Core/frame_0041.png" id="50_3exxq"]
+[ext_resource type="Texture2D" uid="uid://cbyq82f4gtk6s" path="res://Assets/Images/Quantum Core/frame_0042.png" id="51_5aa3q"]
+[ext_resource type="Texture2D" uid="uid://i457h8oum0w8" path="res://Assets/Images/Quantum Core/frame_0043.png" id="52_bmvma"]
+[ext_resource type="Texture2D" uid="uid://bq0qvrhsipp4e" path="res://Assets/Images/Quantum Core/frame_0044.png" id="53_shlp4"]
+[ext_resource type="Texture2D" uid="uid://dt2quhc81d3wo" path="res://Assets/Images/Quantum Core/frame_0045.png" id="54_2n44k"]
+[ext_resource type="Texture2D" uid="uid://d0oi2fd61gekl" path="res://Assets/Images/Quantum Core/frame_0046.png" id="55_86lig"]
+[ext_resource type="Texture2D" uid="uid://b01yfk418d7wm" path="res://Assets/Images/Quantum Core/frame_0047.png" id="56_ldnlw"]
+[ext_resource type="Texture2D" uid="uid://bvm1qvpv38sie" path="res://Assets/Images/Quantum Core/frame_0048.png" id="57_qe8ju"]
+[ext_resource type="Texture2D" uid="uid://5vup1e1q0enx" path="res://Assets/Images/Quantum Core/frame_0049.png" id="58_bnk2o"]
+[ext_resource type="Texture2D" uid="uid://c3istcc0vkwpp" path="res://Assets/Images/Quantum Core/frame_0050.png" id="59_oosfy"]
+[ext_resource type="Texture2D" uid="uid://cikcbqwuovrix" path="res://Assets/Images/Quantum Core/frame_0051.png" id="60_nf4f2"]
+[ext_resource type="Texture2D" uid="uid://b2lfvq1fckhnb" path="res://Assets/Images/Quantum Core/frame_0052.png" id="61_xkvoa"]
+[ext_resource type="Texture2D" uid="uid://du2ad4o6ybx1u" path="res://Assets/Images/Quantum Core/frame_0053.png" id="62_t5kpo"]
+[ext_resource type="Texture2D" uid="uid://bx5812dvhuqy1" path="res://Assets/Images/Quantum Core/frame_0054.png" id="63_pw0td"]
+[ext_resource type="Texture2D" uid="uid://dpd2r7degj32f" path="res://Assets/Images/Quantum Core/frame_0055.png" id="64_37eu1"]
+[ext_resource type="Texture2D" uid="uid://dydjw81vj2b4o" path="res://Assets/Images/Quantum Core/frame_0056.png" id="65_0wkqm"]
+[ext_resource type="Texture2D" uid="uid://rqt2lhxhfasq" path="res://Assets/Images/Quantum Core/frame_0057.png" id="66_ve5sr"]
+[ext_resource type="Texture2D" uid="uid://dopww02od46oh" path="res://Assets/Images/Quantum Core/frame_0058.png" id="67_5s44m"]
+[ext_resource type="Texture2D" uid="uid://5m8ym670qpa7" path="res://Assets/Images/Quantum Core/frame_0059.png" id="68_ibca3"]
+[ext_resource type="Texture2D" uid="uid://cwheacs4hee8" path="res://Assets/Images/Quantum Core/frame_0060.png" id="69_g3y5b"]
+[ext_resource type="Texture2D" uid="uid://ve7bdtsf0x1j" path="res://Assets/Images/Quantum Core/frame_0061.png" id="70_1slqb"]
+[ext_resource type="Texture2D" uid="uid://c2b7otomqd240" path="res://Assets/Images/Quantum Core/frame_0062.png" id="71_uo83y"]
+[ext_resource type="Texture2D" uid="uid://pb30dosr6gla" path="res://Assets/Images/Quantum Core/frame_0063.png" id="72_y0aao"]
+[ext_resource type="Texture2D" uid="uid://ib42nujwgk4s" path="res://Assets/Images/Quantum Core/frame_0064.png" id="73_wm5rm"]
+[ext_resource type="Texture2D" uid="uid://doq7oy5ccywqw" path="res://Assets/Images/Quantum Core/frame_0065.png" id="74_ekl5k"]
+[ext_resource type="Texture2D" uid="uid://dl707yndw8eyo" path="res://Assets/Images/Quantum Core/frame_0066.png" id="75_fdpg8"]
+[ext_resource type="Texture2D" uid="uid://bdiv028pm43um" path="res://Assets/Images/Quantum Core/frame_0067.png" id="76_rpys8"]
+[ext_resource type="Texture2D" uid="uid://bj6l1jfvcgdqt" path="res://Assets/Images/Quantum Core/frame_0068.png" id="77_6gr3f"]
+[ext_resource type="Texture2D" uid="uid://dgcamjso84ike" path="res://Assets/Images/Quantum Core/frame_0069.png" id="78_6seew"]
+[ext_resource type="Texture2D" uid="uid://c6kcmq6vjwr3" path="res://Assets/Images/Quantum Core/frame_0070.png" id="79_3ox4t"]
+[ext_resource type="Texture2D" uid="uid://5s320e322n8j" path="res://Assets/Images/Quantum Core/frame_0071.png" id="80_4fmho"]
+[ext_resource type="Texture2D" uid="uid://i8iajk0yic7m" path="res://Assets/Images/Quantum Core/frame_0072.png" id="81_aivy6"]
+[ext_resource type="Texture2D" uid="uid://iqdbolxycgvt" path="res://Assets/Images/Quantum Core/frame_0073.png" id="82_bil4k"]
+[ext_resource type="Texture2D" uid="uid://cgibajpfe5b2k" path="res://Assets/Images/Quantum Core/frame_0074.png" id="83_hnquj"]
+[ext_resource type="Texture2D" uid="uid://d4m643vuh6oju" path="res://Assets/Images/Quantum Core/frame_0075.png" id="84_0h8y2"]
+[ext_resource type="Texture2D" uid="uid://d1ugtput6xe7a" path="res://Assets/Images/Quantum Core/frame_0076.png" id="85_nycv6"]
+[ext_resource type="Texture2D" uid="uid://d1s4i0vf56moi" path="res://Assets/Images/Quantum Core/frame_0077.png" id="86_x4ftd"]
+[ext_resource type="Texture2D" uid="uid://bcnbcm5b0tnsj" path="res://Assets/Images/Quantum Core/frame_0078.png" id="87_arf1h"]
+[ext_resource type="Texture2D" uid="uid://bem46pbaay0tc" path="res://Assets/Images/Quantum Core/frame_0079.png" id="88_s0om5"]
+[ext_resource type="Texture2D" uid="uid://bsim4ighm42ho" path="res://Assets/Images/Quantum Core/frame_0080.png" id="89_gkfde"]
+[ext_resource type="Texture2D" uid="uid://dlgeosn3otwh2" path="res://Assets/Images/Quantum Core/frame_0081.png" id="90_4qxq8"]
+
+[sub_resource type="Gradient" id="Gradient_1bvp3"]
+colors = PackedColorArray(0, 0.78431374, 1, 1, 0.78431374, 0, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h2yge"]
+bg_color = Color(0.078431375, 0.078431375, 0.19607843, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1bvp3"]
+bg_color = Color(0.78431374, 0, 1, 1)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ryg4g"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_yysqy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_n5t1e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_h6isl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_53bls")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_lwnsi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_41lik")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_jbvwl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_sn1fb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_yvsr8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_vieuh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_yjja3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_l0gw7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_inymm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_jcxqu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_0arob")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_dij0e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_k1udn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_wat4s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_ywjan")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_m74q3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_tko6h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_am8a1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_8dc3g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_htgcl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_smeu8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_f3y11")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_cpm2s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_u81y6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_rt5wr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_mnw77")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_vjgyh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_d5iia")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_asu84")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_qwt6e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_off2o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_tttfs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_1iygd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_g5xqc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_s4o1y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("49_7mmqq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_3exxq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_5aa3q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("52_bmvma")
+}, {
+"duration": 1.0,
+"texture": ExtResource("53_shlp4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("54_2n44k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("55_86lig")
+}, {
+"duration": 1.0,
+"texture": ExtResource("56_ldnlw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("57_qe8ju")
+}, {
+"duration": 1.0,
+"texture": ExtResource("58_bnk2o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("59_oosfy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("60_nf4f2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("61_xkvoa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("62_t5kpo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("63_pw0td")
+}, {
+"duration": 1.0,
+"texture": ExtResource("64_37eu1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("65_0wkqm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("66_ve5sr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("67_5s44m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("68_ibca3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("69_g3y5b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("70_1slqb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("71_uo83y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("72_y0aao")
+}, {
+"duration": 1.0,
+"texture": ExtResource("73_wm5rm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("74_ekl5k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("75_fdpg8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("76_rpys8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("77_6gr3f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("78_6seew")
+}, {
+"duration": 1.0,
+"texture": ExtResource("79_3ox4t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("80_4fmho")
+}, {
+"duration": 1.0,
+"texture": ExtResource("81_aivy6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("82_bil4k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("83_hnquj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("84_0h8y2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("85_nycv6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("86_x4ftd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("87_arf1h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("88_s0om5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("89_gkfde")
+}, {
+"duration": 1.0,
+"texture": ExtResource("90_4qxq8")
+}],
+"loop": true,
+"name": &"default",
+"speed": 24.0
+}]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchor_top = 0.2
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_ig7tw")
+
+[node name="Admob" type="Node" parent="."]
+script = ExtResource("2_0xm2m")
+banner_size = 2
+debug_application_id = "ca-app-pub-3940256099942544~3347511713"
+debug_banner_id = "ca-app-pub-3940256099942544/9214589741"
+debug_interstitial_id = "ca-app-pub-3940256099942544/1033173712"
+debug_rewarded_id = "ca-app-pub-3940256099942544/5224354917"
+debug_rewarded_interstitial_id = "ca-app-pub-3940256099942544/5354046379"
+metadata/_custom_type_script = "uid://b5oe5hgj2uymx"
+
+[node name="TapSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_5vw27")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.039215688, 0.039215688, 0.11764706, 1)
+metadata/_edit_lock_ = true
+
+[node name="NewGame" type="TextureButton" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = -1
+offset_left = 24.0
+offset_top = 24.0
+focus_mode = 0
+texture_normal = ExtResource("4_kek77")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AdBoost" type="TextureButton" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_top = 24.0
+offset_right = -24.0
+grow_horizontal = 0
+focus_mode = 0
+texture_normal = ExtResource("5_n5t1e")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ParticleEffect" type="CPUParticles2D" parent="."]
+position = Vector2(180, 400)
+amount = 50
+lifetime = 0.25
+draw_order = 1
+emission_shape = 2
+emission_sphere_radius = 80.0
+color_ramp = SubResource("Gradient_1bvp3")
+metadata/_edit_lock_ = true
+
+[node name="QuantumCore" type="TextureButton" parent="."]
+modulate = Color(1.2, 1.2, 1.5, 1)
+custom_minimum_size = Vector2(384, 384)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -192.0
+offset_top = -192.0
+offset_right = 192.0
+offset_bottom = 192.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("5_kek77")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="CurrencyDisplay" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_right = 100.0
+grow_horizontal = 2
+theme_override_constants/margin_top = 20
+
+[node name="QuantaLabel" type="Label" parent="CurrencyDisplay"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0, 0.78431374, 1, 1)
+text = "QUANTA
+0"
+horizontal_alignment = 1
+
+[node name="ProgressContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.7
+anchor_right = 0.9
+anchor_bottom = 0.7
+alignment = 1
+
+[node name="ProgressDisplay" type="MarginContainer" parent="ProgressContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="CascadeProgress" type="ProgressBar" parent="ProgressContainer/ProgressDisplay"]
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_h2yge")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1bvp3")
+
+[node name="StatsLabel" type="Label" parent="ProgressContainer"]
+layout_mode = 2
+text = "sasasas"
+horizontal_alignment = 1
+
+[node name="UpgradesContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_lock_ = true
+
+[node name="GridContainer" type="GridContainer" parent="UpgradesContainer"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.1
+anchor_right = 1.0
+anchor_bottom = 0.3
+offset_left = 16.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 3
+
+[node name="Upgrade1" parent="UpgradesContainer/GridContainer" instance=ExtResource("7_272bh")]
+layout_mode = 2
+upgrade_id = "accelerator"
+upgrade_name = "Particle Accelerator"
+description = "+1 Quanta/tap"
+initial_cost = 50
+cost = 50
+texture = ExtResource("7_kek77")
+
+[node name="Upgrade2" parent="UpgradesContainer/GridContainer" instance=ExtResource("7_272bh")]
+layout_mode = 2
+upgrade_id = "stabilizer"
+upgrade_name = "Quantum Stabilizer"
+description = "+1 Quanta/sec"
+initial_cost = 100
+cost = 100
+texture = ExtResource("8_kek77")
+
+[node name="Upgrade3" parent="UpgradesContainer/GridContainer" instance=ExtResource("7_272bh")]
+layout_mode = 2
+upgrade_id = "shift"
+upgrade_name = "Dimensional Shift"
+description = "x2 Multiplier"
+initial_cost = 200
+cost = 200
+texture = ExtResource("9_4c57u")
+
+[node name="QuantumCore2D" type="AnimatedSprite2D" parent="."]
+visible = false
+sprite_frames = SubResource("SpriteFrames_ryg4g")
+frame_progress = 0.97928095
+speed_scale = 2.0
