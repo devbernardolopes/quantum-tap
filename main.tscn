@@ -1,8 +1,9 @@
-[gd_scene load_steps=97 format=3 uid="uid://cyq7iemom75wj"]
+[gd_scene load_steps=99 format=3 uid="uid://cyq7iemom75wj"]
 
 [ext_resource type="Script" uid="uid://bs6o0rxqsqxcg" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://b5oe5hgj2uymx" path="res://addons/AdmobPlugin/Admob.gd" id="2_0xm2m"]
 [ext_resource type="AudioStream" uid="uid://dsef6olbqb81e" path="res://Assets/Sounds/impactGlass_heavy_003.ogg" id="3_5vw27"]
+[ext_resource type="Shader" uid="uid://dn1i5dvuqxadu" path="res://starfield.gdshader" id="4_53bls"]
 [ext_resource type="Texture2D" uid="uid://uw4s7cvuuqw4" path="res://Assets/Images/UI/play-button.png" id="4_kek77"]
 [ext_resource type="Texture2D" uid="uid://cah45jxeb7ero" path="res://Assets/Images/Quantum Core.png" id="5_kek77"]
 [ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
@@ -92,6 +93,20 @@
 [ext_resource type="Texture2D" uid="uid://bem46pbaay0tc" path="res://Assets/Images/Quantum Core/frame_0079.png" id="88_s0om5"]
 [ext_resource type="Texture2D" uid="uid://bsim4ighm42ho" path="res://Assets/Images/Quantum Core/frame_0080.png" id="89_gkfde"]
 [ext_resource type="Texture2D" uid="uid://dlgeosn3otwh2" path="res://Assets/Images/Quantum Core/frame_0081.png" id="90_4qxq8"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lwnsi"]
+shader = ExtResource("4_53bls")
+shader_parameter/dimensions = Vector2(360, 800)
+shader_parameter/small_stars = 50.0
+shader_parameter/small_stars_far_size = 0.5
+shader_parameter/small_stars_near_size = 1.0
+shader_parameter/large_stars = 8.0
+shader_parameter/large_stars_far_size = 0.5
+shader_parameter/large_stars_near_size = 1.0
+shader_parameter/far_stars_color = Color(0.5, 0, 1, 1)
+shader_parameter/near_stars_color = Color(1, 1, 1, 1)
+shader_parameter/base_scroll_speed = 0.12999999709424
+shader_parameter/additional_scroll_speed = 0.0999999977648
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ryg4g"]
 animations = [{
@@ -378,6 +393,7 @@ metadata/_custom_type_script = "uid://b5oe5hgj2uymx"
 stream = ExtResource("3_5vw27")
 
 [node name="Background" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_lwnsi")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -490,7 +506,6 @@ theme_override_constants/margin_bottom = 10
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_h2yge")
 theme_override_styles/fill = SubResource("StyleBoxFlat_1bvp3")
-max_value = 1000.0
 
 [node name="StatsLabel" type="Label" parent="ProgressContainer"]
 layout_mode = 2

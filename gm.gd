@@ -6,7 +6,7 @@ var quanta_per_second: int = 0
 var multiplier: float = 1.0
 var quanta_accumulator: float = 0.0
 var cascade_progress: float = 0.0
-var cascade_threshold: float = 1000.0
+var cascade_threshold: float = 100.0
 
 var upgrades: Dictionary = {
 	"accelerator": {"initial_cost": 50, "cost": 50, "level": 1, "max_level": 25, "effect": func(): quanta_per_tap += 1},
@@ -78,6 +78,9 @@ func trigger_cascade() -> void:
 	var bonus = quanta * (1.0 + upgrades.accelerator.level * 0.1)
 	quanta += int(bonus)
 	cascade_progress = 0.0
+	cascade_threshold *= 10
+	cascade_threshold = min(cascade_threshold, Globals.MAX_CASCADE_THRESHOLD)
+	set_progress_bar_max_value(cascade_threshold)
 
 func save_game() -> void:
 	var config = ConfigFile.new()
@@ -146,3 +149,23 @@ func reset_game() -> void:
 		if error != OK:
 			print("Error deleting save file: ", error)
 	emit_signal("game_state_updated")
+
+# A function (or simply in _ready if Gm.gd is initialized after Main scene loads)
+func set_progress_bar_max_value(new_max_value: float):
+	# Get a reference to the root of the current scene tree
+	var root = get_tree().get_root()
+	
+	# Assuming 'Main' is the root of your main scene and 'CascadeProgress' is a direct child 
+	# OR you know the full path (e.g., "Main/CascadeProgress")
+	var progress_bar = root.get_node("Main/ProgressContainer/ProgressDisplay/CascadeProgress")
+	
+	# A safer way to find the node anywhere in the current scene tree's children:
+	# var progress_bar = root.find_node("CascadeProgress", true, false)
+	
+	if progress_bar and progress_bar is ProgressBar:
+		# Change the max_value property
+		progress_bar.max_value = new_max_value
+		print("Updated CascadeProgress max_value to: ", new_max_value)
+	else:
+		# This will help debug if the node is not found or is the wrong type
+		print("Error: Could not find ProgressBar node named 'CascadeProgress'.")
