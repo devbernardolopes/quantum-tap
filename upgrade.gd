@@ -27,6 +27,9 @@ extends VBoxContainer
 	set(value):
 		level = value
 		update_ui()
+@export var max_level: int:
+	set(value):
+		max_level = value
 @export var texture: Texture2D:
 	set(value):
 		texture = value
@@ -38,6 +41,14 @@ extends VBoxContainer
 @onready var purchase_sound: AudioStreamPlayer2D = $PurchaseSound
 
 func _ready() -> void:
+	if name_label:
+		name_label.add_theme_font_override("font", Globals.UI_FONT_REGULAR)
+		name_label.add_theme_font_size_override("font_size", Globals.UPGRADE_NAME_FONT_SIZE)
+
+	if info_label:
+		info_label.add_theme_font_override("font", Globals.UI_FONT_LIGHT)
+		info_label.add_theme_font_size_override("font_size", Globals.UPGRADE_INFO_FONT_SIZE)
+
 	update_ui()
 
 func _notification(what: int) -> void:
@@ -46,20 +57,22 @@ func _notification(what: int) -> void:
 
 func set_enabled(enabled: bool) -> void:
 	if icon_button:
-		icon_button.disabled = not enabled
-		icon_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if enabled else Color(0.502, 0.502, 0.502, 1.0)
+		if level < max_level:
+			icon_button.disabled = not enabled
+			icon_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if enabled else Color(0.502, 0.502, 0.502, 1.0)
+		else:
+			icon_button.disabled = true
 
 func update_ui() -> void:
 	if icon_button and texture:
 		icon_button.texture_normal = texture
 	if name_label:
 		name_label.text = upgrade_name if upgrade_name else "Upgrade"
-		name_label.add_theme_font_override("font", Globals.UI_FONT_REGULAR)
-		name_label.add_theme_font_size_override("font_size", Globals.UPGRADE_NAME_FONT_SIZE)
 	if info_label:
-		info_label.text = "%s\nCost: %d\n Level: %d" % [description, cost, level]
-		info_label.add_theme_font_override("font", Globals.UI_FONT_LIGHT)
-		info_label.add_theme_font_size_override("font_size", Globals.UPGRADE_INFO_FONT_SIZE)
+		if level < max_level:
+			info_label.text = "%s\nCost: %d\n Level: %d" % [description, cost, level]
+		else:
+			info_label.text = "%s\nMAX" % [description]
 
 	# Check Quanta against cost for enabling/disabling
 	if Engine.is_editor_hint():

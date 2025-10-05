@@ -6,12 +6,12 @@ var quanta_per_second: int = 0
 var multiplier: float = 1.0
 var quanta_accumulator: float = 0.0
 var cascade_progress: float = 0.0
-var cascade_threshold: float = 100.0
+var cascade_threshold: float = 1000.0
 
 var upgrades: Dictionary = {
-	"accelerator": {"initial_cost": 50, "cost": 50, "level": 0, "effect": func(): quanta_per_tap += 1},
-	"stabilizer": {"initial_cost": 100, "cost": 100, "level": 0, "effect": func(): quanta_per_second += 1},
-	"shift": {"initial_cost": 200, "cost": 200, "level": 0, "effect": func(): multiplier *= 2}
+	"accelerator": {"initial_cost": 50, "cost": 50, "level": 1, "max_level": 25, "effect": func(): quanta_per_tap += 1},
+	"stabilizer": {"initial_cost": 200, "cost": 200, "level": 0, "max_level": 9, "effect": func(): quanta_per_second += 1},
+	"shift": {"initial_cost": 200, "cost": 500, "level": 0, "max_level": 4, "effect": func(): multiplier *= 2}
 }
 
 signal game_state_updated
@@ -34,7 +34,8 @@ func _notification(what: int) -> void:
 		save_game()
 		
 func add_quanta(amount: int) -> void:
-	quanta += int(amount * multiplier)
+	#quanta += int(amount * multiplier)
+	quanta += int(amount)
 	cascade_progress += amount
 	if cascade_progress >= cascade_threshold:
 		trigger_cascade()
@@ -44,7 +45,7 @@ func get_upgrade_cost(initial_cost: int, cost: int, level: int, formula: Globals
 	
 	match formula:
 		Globals.UPGRADE_PROGRESSION_FORMULA.QUADRATIC:
-			return int(initial_cost + Globals.UPGRADE_INCREMENT * pow(level, 2))
+			return int(cost + Globals.UPGRADE_INCREMENT * pow((level + 1), 2))
 
 		Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL:
 			return int(cost * Globals.UPGRADE_MULTIPLIER)
@@ -64,7 +65,8 @@ func purchase_upgrade(upgrade_id: String) -> bool:
 	var upgrade = upgrades[upgrade_id]
 	if quanta >= upgrade.cost:
 		quanta -= upgrade.cost
-		upgrade.level += 1
+		#upgrade.level += 1
+		upgrade.level = min(upgrade.level + 1, upgrade.max_level)
 		upgrade.cost = get_upgrade_cost(upgrade.initial_cost, upgrade.cost, upgrade.level, Globals.UPGRADE_PROGRESSION)
 		#upgrade.cost = int(upgrade.cost + Globals.UPGRADE_INCREMENT * pow(upgrade.level, 2))
 		#upgrade.cost = int(upgrade.cost * Globals.UPGRADE_COST_MULTIPLIER) # Cost increases by 50% per level
@@ -91,6 +93,7 @@ func save_game() -> void:
 		config.set_value("upgrades", upgrade_id + "_initial_cost", upgrade.initial_cost)
 		config.set_value("upgrades", upgrade_id + "_cost", upgrade.cost)
 		config.set_value("upgrades", upgrade_id + "_level", upgrade.level)
+		config.set_value("upgrades", upgrade_id + "_max_level", upgrade.max_level)
 	
 	var error = config.save("user://savegame.cfg")
 	if error != OK:
@@ -114,6 +117,7 @@ func load_game() -> void:
 		upgrade.cost = config.get_value("upgrades", upgrade_id + "_initial_cost", upgrade.initial_cost)
 		upgrade.cost = config.get_value("upgrades", upgrade_id + "_cost", upgrade.cost)
 		upgrade.level = config.get_value("upgrades", upgrade_id + "_level", 0)
+		upgrade.max_level = config.get_value("upgrades", upgrade_id + "_max_level", 0)
 	
 	# Recompute effects based on loaded levels
 	quanta_per_tap = 1 + upgrades.accelerator.level
@@ -131,9 +135,9 @@ func reset_game() -> void:
 	cascade_progress = 0.0
 	quanta_accumulator = 0.0
 	upgrades = {
-		"accelerator": {"initial_cost": 50, "cost": 50, "level": 0, "effect": func(): quanta_per_tap += 1},
-		"stabilizer": {"initial_cost": 100, "cost": 100, "level": 0, "effect": func(): quanta_per_second += 1},
-		"shift": {"initial_cost": 200, "cost": 200, "level": 0, "effect": func(): multiplier *= 2}
+		"accelerator": {"initial_cost": 50, "cost": 50, "level": 1, "max_level": 25, "effect": func(): quanta_per_tap += 1},
+		"stabilizer": {"initial_cost": 200, "cost": 200, "level": 0, "max_level": 9, "effect": func(): quanta_per_second += 1},
+		"shift": {"initial_cost": 500, "cost": 500, "level": 0, "max_level": 4, "effect": func(): multiplier *= 2}
 	}
 	# Delete save file
 	var dir = DirAccess.open("user://")
