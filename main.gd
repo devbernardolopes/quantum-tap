@@ -4,6 +4,8 @@ extends Control
 
 @onready var tap_sound: AudioStreamPlayer2D = $TapSound
 
+@onready var background: ColorRect = $Background
+
 @onready var quanta_label = $CurrencyDisplay/QuantaLabel
 
 @onready var quantum_core: TextureButton = $QuantumCore
@@ -21,8 +23,9 @@ extends Control
 @onready var new_game: TextureButton = $NewGame
 @onready var ad_boost: TextureButton = $AdBoost
 
-var is_admob_initialized: bool = false
+var circular_cascade_timer: Timer = null
 
+var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
 
 func _ready() -> void:
@@ -70,9 +73,11 @@ func _ready() -> void:
 	upgrade2.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("stabilizer"))
 	upgrade3.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("shift"))
 	
-	# Connect Gm signal
+	# Connect Gm signals
+	Gm.quanta_changed.connect(_on_quanta_changed)
 	Gm.game_state_updated.connect(update_ui)
 	
+	# Apply custom themes
 	quanta_label.add_theme_font_override("font", Globals.QUANTA_LABEL_FONT)
 	quanta_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_NORMAL)
 
@@ -84,6 +89,11 @@ func _ready() -> void:
 	#setup_cascade_progress()
 	
 	particle_effect.emitting = false
+
+	# Timers
+	circular_cascade_timer = Timer.new()
+	
+	add_child(circular_cascade_timer)
 
 	# Update initial UI
 	update_ui()
@@ -145,6 +155,17 @@ func show_rewarded_interstitial_ad() -> void:
 				admob.show_rewarded_interstitial_ad()
 
 func _process(_delta: float) -> void:
+	if circular_cascade_progress.material:
+		var _material: ShaderMaterial = circular_cascade_progress.material
+		if _material:
+			var rotation_offset: float = _material.get_shader_parameter("rotation_offset")
+			rotation_offset += Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED * _delta
+
+			if rotation_offset >= TAU:
+				rotation_offset -= TAU
+
+			_material.set_shader_parameter("rotation_offset", rotation_offset)
+
 	update_ui()
 
 func _on_quantum_core_pressed() -> void:
@@ -404,11 +425,20 @@ func _on_ad_boost_pressed() -> void:
 				#load_interstitial_ad()
 				#reset_game()
 
+func _on_quanta_changed(new_value: int) -> void:
+	if background:
+		var quanta_normalized_value: float = float(new_value) / float(Globals.QUANTA_GOAL)
+		#var background_material: ShaderMaterial = background.material
+		#if background_material:
+			#if quanta_normalized_value < 0.05:
+				#quanta_normalized_value = 0.05
+			#background_material.set_shader_parameter("base_scroll_speed", quanta_normalized_value)
+		print(str(quanta_normalized_value))
+			#background_material.set_shader_parameter("additional_scroll_speed", quanta_normalized_value)
+
 func _on_cascade_progress_value_changed(value: float) -> void:
 	if circular_cascade_progress.material:
 		var normalized_value: float = cascade_progress.value / cascade_progress.max_value
 		var _material: ShaderMaterial = circular_cascade_progress.material
-		#_material.set_shader_parameter("u_aspect", cascade_progress.size.x / cascade_progress.size.y)
-		_material.set_shader_parameter("progress", normalized_value)
-		#print(str(_material.get_shader_parameter("u_aspect")))
-		#print(str(_material.get_shader_parameter("progress")))
+		if _material:
+			_material.set_shader_parameter("progress", normalized_value)

@@ -64,4 +64,7 @@ const SHIFT_COST: int = 500
 const SHIFT_LEVEL: int = 0
 const SHIFT_MAX_LEVEL: int = 4
 
-const QUANTA_GOAL: int = 9223372036854775807
+#const QUANTA_GOAL: int = 9223372036854775807
+const QUANTA_GOAL: int = 1000
+
+const CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED: float = 1.0 # radians per second

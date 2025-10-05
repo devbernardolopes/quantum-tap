@@ -106,8 +106,8 @@ shader_parameter/large_stars_far_size = 0.5
 shader_parameter/large_stars_near_size = 1.0
 shader_parameter/far_stars_color = Color(0.5, 0, 1, 1)
 shader_parameter/near_stars_color = Color(1, 1, 1, 1)
-shader_parameter/base_scroll_speed = 0.12999999709424
-shader_parameter/additional_scroll_speed = 0.00999999977648
+shader_parameter/base_scroll_speed = 0.0999999977648
+shader_parameter/additional_scroll_speed = 0.05
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ryg4g"]
 animations = [{
@@ -459,7 +459,7 @@ stretch_mode = 5
 position = Vector2(185, 411)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_ryg4g")
-frame_progress = 0.4730684
+frame_progress = 0.25651136
 speed_scale = 0.5
 script = ExtResource("88_h6isl")
 

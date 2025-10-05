@@ -1,6 +1,17 @@
 extends Node
 
-var quanta: int = 0 # 9223372036854775807 Biggest value an int can store
+var _quanta_internal: int = 0
+
+## 9223372036854775807 Biggest value an int can store
+var quanta: int:
+	get:
+		return _quanta_internal
+	set(value):
+		if _quanta_internal == value:
+			return
+		_quanta_internal = value
+		emit_signal("quanta_changed", value)
+
 var quanta_per_tap: int = 1
 var quanta_per_second: int = 0
 var multiplier: float = 1.0
@@ -15,6 +26,7 @@ var upgrades: Dictionary = {
 }
 
 signal game_state_updated
+signal quanta_changed(new_value: int)
 
 func _ready() -> void:
 	load_game()
