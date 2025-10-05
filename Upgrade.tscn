@@ -13,8 +13,6 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 script = ExtResource("1_g2cgu")
-initial_cost = null
-max_level = null
 
 [node name="PurchaseSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("2_6w8xc")
@@ -23,6 +21,7 @@ stream = ExtResource("2_6w8xc")
 custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
 size_flags_vertical = 3
+focus_mode = 0
 disabled = true
 ignore_texture_size = true
 stretch_mode = 5

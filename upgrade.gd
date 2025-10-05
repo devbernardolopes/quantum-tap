@@ -49,6 +49,8 @@ func _ready() -> void:
 		info_label.add_theme_font_override("font", Globals.UI_FONT_LIGHT)
 		info_label.add_theme_font_size_override("font_size", Globals.UPGRADE_INFO_FONT_SIZE)
 
+	
+
 	update_ui()
 
 func _notification(what: int) -> void:
@@ -70,7 +72,7 @@ func update_ui() -> void:
 		name_label.text = upgrade_name if upgrade_name else "Upgrade"
 	if info_label:
 		if level < max_level:
-			info_label.text = "%s\nCost: %d\n Level: %d" % [description, cost, level]
+			info_label.text = "%s\nCost: %d\n Level: %d/%d" % [description, cost, level, max_level]
 		else:
 			info_label.text = "%s\nMAX" % [description]
 

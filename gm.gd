@@ -6,12 +6,12 @@ var quanta_per_second: int = 0
 var multiplier: float = 1.0
 var quanta_accumulator: float = 0.0
 var cascade_progress: float = 0.0
-var cascade_threshold: float = 100.0
+var cascade_threshold: float = Globals.MIN_CASCADE_THRESHOLD
 
 var upgrades: Dictionary = {
-	"accelerator": {"initial_cost": 50, "cost": 50, "level": 1, "max_level": 25, "effect": func(): quanta_per_tap += 1},
-	"stabilizer": {"initial_cost": 200, "cost": 200, "level": 0, "max_level": 9, "effect": func(): quanta_per_second += 1},
-	"shift": {"initial_cost": 200, "cost": 500, "level": 0, "max_level": 4, "effect": func(): multiplier *= 2}
+	"accelerator": {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
+	"stabilizer": {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
+	"shift": {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
 }
 
 signal game_state_updated
@@ -34,8 +34,8 @@ func _notification(what: int) -> void:
 		save_game()
 		
 func add_quanta(amount: int) -> void:
-	#quanta += int(amount * multiplier)
-	quanta += int(amount)
+	quanta += int(amount * multiplier)
+	#quanta += int(amount)
 	cascade_progress += amount
 	if cascade_progress >= cascade_threshold:
 		trigger_cascade()
@@ -78,7 +78,7 @@ func trigger_cascade() -> void:
 	var bonus = quanta * (1.0 + upgrades.accelerator.level * 0.1)
 	quanta += int(bonus)
 	cascade_progress = 0.0
-	cascade_threshold *= 10
+	cascade_threshold *= Globals.CASCADE_THRESHOLD_MULTIPLIER
 	cascade_threshold = min(cascade_threshold, Globals.MAX_CASCADE_THRESHOLD)
 	set_progress_bar_max_value(cascade_threshold)
 
@@ -89,6 +89,7 @@ func save_game() -> void:
 	config.set_value("game", "quanta_per_second", quanta_per_second)
 	config.set_value("game", "multiplier", multiplier)
 	config.set_value("game", "cascade_progress", cascade_progress)
+	config.set_value("game", "cascade_threshold", cascade_threshold)
 	config.set_value("game", "quanta_accumulator", quanta_accumulator)
 	
 	for upgrade_id in upgrades:
@@ -113,6 +114,7 @@ func load_game() -> void:
 	quanta_per_second = config.get_value("game", "quanta_per_second", 0)
 	multiplier = config.get_value("game", "multiplier", 1.0)
 	cascade_progress = config.get_value("game", "cascade_progress", 0.0)
+	cascade_threshold = config.get_value("game", "cascade_threshold", 0.0)
 	quanta_accumulator = config.get_value("game", "quanta_accumulator", 0.0)
 	
 	for upgrade_id in upgrades:
@@ -127,6 +129,8 @@ func load_game() -> void:
 	quanta_per_second = 0 + upgrades.stabilizer.level
 	multiplier = pow(2, upgrades.shift.level)
 	
+	set_progress_bar_max_value(cascade_threshold)
+	
 	emit_signal("game_state_updated")
 
 func reset_game() -> void:
@@ -136,12 +140,15 @@ func reset_game() -> void:
 	quanta_per_second = 0
 	multiplier = 1.0
 	cascade_progress = 0.0
+	cascade_threshold = Globals.MIN_CASCADE_THRESHOLD
 	quanta_accumulator = 0.0
 	upgrades = {
-		"accelerator": {"initial_cost": 50, "cost": 50, "level": 1, "max_level": 25, "effect": func(): quanta_per_tap += 1},
-		"stabilizer": {"initial_cost": 200, "cost": 200, "level": 0, "max_level": 9, "effect": func(): quanta_per_second += 1},
-		"shift": {"initial_cost": 500, "cost": 500, "level": 0, "max_level": 4, "effect": func(): multiplier *= 2}
+		"accelerator": {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
+		"stabilizer": {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
+		"shift": {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
 	}
+	set_progress_bar_max_value(cascade_threshold)
+	
 	# Delete save file
 	var dir = DirAccess.open("user://")
 	if dir.file_exists("savegame.cfg"):
@@ -169,3 +176,21 @@ func set_progress_bar_max_value(new_max_value: float):
 	else:
 		# This will help debug if the node is not found or is the wrong type
 		print("Error: Could not find ProgressBar node named 'CascadeProgress'.")
+
+func format_number(value: int, delimiter: String) -> String:
+	var str_val := str(abs(value))
+	var result := ""
+	var count := 0
+
+	# Traverse the string backwards and insert delimiters
+	for i in range(str_val.length() - 1, -1, -1):
+		result = str_val[i] + result
+		count += 1
+		if count % 3 == 0 and i != 0:
+			result = delimiter + result
+
+	# Add the minus sign back if needed
+	if value < 0:
+		result = "-" + result
+
+	return result

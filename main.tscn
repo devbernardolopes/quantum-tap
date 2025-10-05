@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
 [ext_resource type="PackedScene" uid="uid://b5a2h1nfm8k8v" path="res://Upgrade.tscn" id="7_272bh"]
 [ext_resource type="Texture2D" uid="uid://b4j031cciwjif" path="res://Assets/Images/Upgrades/Particle Accelerator 2.png" id="7_kek77"]
+[ext_resource type="Shader" uid="uid://bsgelfmjf24im" path="res://circular_progress_bar.gdshader" id="8_41lik"]
 [ext_resource type="Texture2D" uid="uid://bx2nopw20ksg8" path="res://Assets/Images/Upgrades/Quantum Stabilizer 2.png" id="8_kek77"]
 [ext_resource type="Texture2D" uid="uid://cm85uhkhkcbp1" path="res://Assets/Images/Upgrades/Dimensional Shift.png" id="9_4c57u"]
 [ext_resource type="Texture2D" uid="uid://bdvwpv45rx3wl" path="res://Assets/Images/Quantum Core/frame_0001.png" id="10_yysqy"]
@@ -96,17 +97,17 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lwnsi"]
 shader = ExtResource("4_53bls")
-shader_parameter/dimensions = Vector2(360, 800)
-shader_parameter/small_stars = 50.0
+shader_parameter/dimensions = Vector2(2048, 2048)
+shader_parameter/small_stars = 111.0
 shader_parameter/small_stars_far_size = 0.5
 shader_parameter/small_stars_near_size = 1.0
-shader_parameter/large_stars = 8.0
+shader_parameter/large_stars = 20.0
 shader_parameter/large_stars_far_size = 0.5
 shader_parameter/large_stars_near_size = 1.0
 shader_parameter/far_stars_color = Color(0.5, 0, 1, 1)
 shader_parameter/near_stars_color = Color(1, 1, 1, 1)
 shader_parameter/base_scroll_speed = 0.12999999709424
-shader_parameter/additional_scroll_speed = 0.0999999977648
+shader_parameter/additional_scroll_speed = 0.00999999977648
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ryg4g"]
 animations = [{
@@ -359,14 +360,21 @@ animations = [{
 "speed": 24.0
 }]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jbvwl"]
+shader = ExtResource("8_41lik")
+shader_parameter/progress = 0.5
+shader_parameter/ring_thickness = 0.00999999977648
+shader_parameter/ring_radius = 0.45000001811512
+shader_parameter/progress_color = Color(1, 0.5, 1, 1)
+shader_parameter/background_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/gradient_color = Color(0.5, 0.2, 1, 1)
+shader_parameter/smoothness = 0.01
+shader_parameter/gradient_strength = 0.5
+shader_parameter/use_gradient = true
+shader_parameter/rotation_offset = 0.0
+
 [sub_resource type="Gradient" id="Gradient_1bvp3"]
 colors = PackedColorArray(0, 0.78431374, 1, 1, 0.78431374, 0, 1, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h2yge"]
-bg_color = Color(0.078431375, 0.078431375, 0.19607843, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1bvp3"]
-bg_color = Color(0.78431374, 0, 1, 1)
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -430,17 +438,17 @@ stretch_mode = 5
 
 [node name="QuantumCore" type="TextureButton" parent="."]
 modulate = Color(1.2, 1.2, 1.5, 1)
-custom_minimum_size = Vector2(384, 384)
+custom_minimum_size = Vector2(360, 360)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -192.0
-offset_top = -192.0
-offset_right = 192.0
-offset_bottom = 192.0
+offset_left = -180.0
+offset_top = -180.0
+offset_right = 180.0
+offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 texture_normal = ExtResource("5_kek77")
@@ -449,10 +457,20 @@ stretch_mode = 5
 
 [node name="QuantumCore2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(185, 411)
-scale = Vector2(0.88, 0.88)
+scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_ryg4g")
+frame_progress = 0.4730684
 speed_scale = 0.5
 script = ExtResource("88_h6isl")
+
+[node name="CircularCascadeProgress" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_jbvwl")
+custom_minimum_size = Vector2(360, 360)
+layout_mode = 0
+offset_top = 230.0
+offset_right = 360.0
+offset_bottom = 590.0
+mouse_filter = 2
 
 [node name="ParticleEffect" type="CPUParticles2D" parent="."]
 position = Vector2(180, 400)
@@ -503,13 +521,14 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_bottom = 10
 
 [node name="CascadeProgress" type="ProgressBar" parent="ProgressContainer/ProgressDisplay"]
+custom_minimum_size = Vector2(288, 0)
 layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_h2yge")
-theme_override_styles/fill = SubResource("StyleBoxFlat_1bvp3")
+step = 1.0
+value = 50.0
 
 [node name="StatsLabel" type="Label" parent="ProgressContainer"]
 layout_mode = 2
-text = "sasasas"
+text = "STATS"
 horizontal_alignment = 1
 
 [node name="UpgradesContainer" type="Control" parent="."]
@@ -540,10 +559,9 @@ columns = 3
 layout_mode = 2
 upgrade_id = "accelerator"
 upgrade_name = "Particle Accelerator"
-description = "+1 Quanta/tap"
+description = "+%d Quanta/tap"
 initial_cost = 50
 cost = 50
-level = 1
 max_level = 25
 texture = ExtResource("7_kek77")
 
@@ -554,7 +572,7 @@ upgrade_name = "Quantum Stabilizer"
 description = "+1 Quanta/sec"
 initial_cost = 200
 cost = 200
-max_level = 9
+max_level = 10
 texture = ExtResource("8_kek77")
 
 [node name="Upgrade3" parent="UpgradesContainer/GridContainer" instance=ExtResource("7_272bh")]

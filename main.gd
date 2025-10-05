@@ -10,7 +10,8 @@ extends Control
 @onready var particle_effect = $ParticleEffect
 @onready var quantum_core_2d: AnimatedSprite2D = $QuantumCore2D
 
-@onready var cascade_progress = $ProgressContainer/ProgressDisplay/CascadeProgress
+@onready var circular_cascade_progress: ColorRect = $CircularCascadeProgress
+@onready var cascade_progress: ProgressBar = $ProgressContainer/ProgressDisplay/CascadeProgress
 @onready var stats_label: Label = $ProgressContainer/StatsLabel
 
 @onready var upgrade1 = $UpgradesContainer/GridContainer/Upgrade1
@@ -72,13 +73,15 @@ func _ready() -> void:
 	# Connect Gm signal
 	Gm.game_state_updated.connect(update_ui)
 	
-	quanta_label.add_theme_font_override("font", Globals.UI_FONT_BOLD)
+	quanta_label.add_theme_font_override("font", Globals.QUANTA_LABEL_FONT)
 	quanta_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_NORMAL)
 
 	stats_label.add_theme_font_override("font", Globals.UI_FONT_REGULAR)
 	stats_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_NORMAL)
 
+	cascade_progress.value_changed.connect(_on_cascade_progress_value_changed)
 	setup_cascade_progress_bar()
+	#setup_cascade_progress()
 	
 	particle_effect.emitting = false
 
@@ -157,10 +160,10 @@ func _on_quantum_core_pressed() -> void:
 	# Create tween for animation
 	var tween = create_tween().set_parallel(true)
 	# Scale pulse: grow to 1.1x and back
-	tween.tween_property(quantum_core_2d, "scale", Vector2(1.1, 1.1), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(quantum_core_2d, "scale", Globals.QUANTUM_CORE_MAX_SCALE, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(quantum_core_2d, "scale", Globals.QUANTUM_CORE_ORIGINAL_SCALE, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
 	# Glow flash: brighten modulate and back
-	tween.tween_property(quantum_core_2d, "modulate", Color(1.5, 1.5, 2.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(quantum_core_2d, "modulate", Color(1.81, 0.679, 0.879, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(quantum_core_2d, "modulate", Color(1.0, 1.0, 1.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
 	# Rotation: slight spin
 	tween.tween_property(quantum_core_2d, "rotation_degrees", 5.0, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -193,7 +196,8 @@ func _on_upgrade_pressed(upgrade_id: String) -> void:
 func update_ui() -> void:
 	particle_effect.position = quantum_core.position + (quantum_core.size / 2)
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
-	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n%d" % Gm.quanta
+	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
+	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
 	cascade_progress.value = Gm.cascade_progress
 	
 	# Sync Upgrade properties with Gm.upgrades
@@ -209,10 +213,69 @@ func update_ui() -> void:
 	
 	if stats_label:
 		stats_label.text = "\nq/t: %d, q/s: %d, m: %d" % [Gm.quanta_per_tap, Gm.quanta_per_second, Gm.multiplier]
+		stats_label.visible = false
 
-	#upgrade1.tooltip_text = "Particle Accelerator: +1 Quanta/tap, Cost: %d" % Gm.upgrades.accelerator.cost
-	#upgrade2.tooltip_text = "Quantum Stabilizer: +1 Quanta/sec, Cost: %d" % Gm.upgrades.stabilizer.cost
-	#upgrade3.tooltip_text = "Dimensional Shift: x2 Multiplier, Cost: %d" % Gm.upgrades.shift.cost
+func create_gradient_fill() -> StyleBoxTexture:
+	var _size: Vector2i = cascade_progress.size # Vector2i(256, cascade_progress.size.y)  # base texture size; adjust to your bar height
+	var img := Image.create_empty(_size.x, _size.y, false, Image.FORMAT_RGBA8)
+
+	# Create a horizontal gradient
+	var gradient := Gradient.new()
+	gradient.add_point(0.0, Color(0.3, 0.6, 1.0))   # left color
+	gradient.add_point(1.0, Color(0.0, 0.22, 0.473)) # right color
+
+	# Fill the image with gradient colors
+	for x in range(_size.x):
+		var t := float(x) / float(_size.x - 1)
+		var col := gradient.sample(t)
+		for y in range(_size.y):
+			img.set_pixel(x, y, col)
+
+	# Create texture from image
+	var tex := ImageTexture.create_from_image(img)
+
+	# Create a StyleBoxTexture and use that gradient texture
+	var sb := StyleBoxTexture.new()
+	sb.texture = tex
+	sb.set_expand_margin_all(2.0)
+	sb.modulate_color = Color.WHITE  # preserves gradient colors accurately
+
+	return sb
+
+func create_animated_gradient_fill() -> StyleBoxFlat:
+	var fill := StyleBoxFlat.new()
+	fill.corner_radius_top_left = Globals.CORNER_RADIUS
+	fill.corner_radius_top_right = Globals.CORNER_RADIUS
+	fill.corner_radius_bottom_left = Globals.CORNER_RADIUS
+	fill.corner_radius_bottom_right = Globals.CORNER_RADIUS
+	fill.set_border_width_all(1)
+	fill.border_color = Color(0.0, 0.22, 0.473)
+
+	# Create a shader that animates a moving gradient
+	var shader_code := """
+		shader_type canvas_item;
+
+		uniform float speed : hint_range(0.0, 5.0) = 0.3;
+		uniform vec3 color_start : source_color = vec3(0.3, 0.6, 1.0);
+		uniform vec3 color_end : source_color = vec3(0.0, 0.22, 0.473);
+		uniform float brightness = 1.0;
+
+		void fragment() {
+			float offset = mod(UV.x + TIME * speed, 1.0);
+			vec3 color = mix(color_start, color_end, offset);
+			COLOR = vec4(color * brightness, 1.0);
+		}
+	"""
+
+	var shader := Shader.new()
+	shader.code = shader_code
+
+	var shader_mat := ShaderMaterial.new()
+	shader_mat.shader = shader
+
+	fill.material = shader_mat
+
+	return fill
 
 func setup_cascade_progress_bar() -> void:
 	var bg := StyleBoxFlat.new()
@@ -223,20 +286,23 @@ func setup_cascade_progress_bar() -> void:
 	bg.corner_radius_bottom_right = Globals.CORNER_RADIUS
 	bg.set_border_width_all(1)
 	bg.border_color = Color(0.3, 0.3, 0.4)
-
+	
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = Color(0.3, 0.6, 1.0)
 	fill.corner_radius_top_left = Globals.CORNER_RADIUS
 	fill.corner_radius_top_right = Globals.CORNER_RADIUS
 	fill.corner_radius_bottom_left = Globals.CORNER_RADIUS
 	fill.corner_radius_bottom_right = Globals.CORNER_RADIUS
+	fill.set_border_width_all(1)
+	fill.border_color = Color(0.0, 0.22, 0.473, 1.0)
 	
-	fill.bg_color = Color(0.2, 0.5, 1.0)
-	fill.shadow_color = Color(0, 0, 0, 0.3)
-	fill.shadow_size = 2
+	#fill.bg_color = Color(0.2, 0.5, 1.0)
+	#fill.shadow_color = Color(0, 0, 0, 0.3)
+	#fill.shadow_size = 2
 
 	cascade_progress.add_theme_stylebox_override("background", bg)
 	cascade_progress.add_theme_stylebox_override("fill", fill)
+
 	cascade_progress.add_theme_font_override("font", Globals.UI_FONT_BOLD)
 	cascade_progress.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_LARGE)
 	#var tw = create_tween()
@@ -337,3 +403,12 @@ func _on_ad_boost_pressed() -> void:
 			#else:
 				#load_interstitial_ad()
 				#reset_game()
+
+func _on_cascade_progress_value_changed(value: float) -> void:
+	if circular_cascade_progress.material:
+		var normalized_value: float = cascade_progress.value / cascade_progress.max_value
+		var _material: ShaderMaterial = circular_cascade_progress.material
+		#_material.set_shader_parameter("u_aspect", cascade_progress.size.x / cascade_progress.size.y)
+		_material.set_shader_parameter("progress", normalized_value)
+		#print(str(_material.get_shader_parameter("u_aspect")))
+		#print(str(_material.get_shader_parameter("progress")))
