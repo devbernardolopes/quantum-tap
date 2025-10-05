@@ -8,6 +8,7 @@ extends Control
 
 @onready var quantum_core: TextureButton = $QuantumCore
 @onready var particle_effect = $ParticleEffect
+@onready var quantum_core_2d: AnimatedSprite2D = $QuantumCore2D
 
 @onready var cascade_progress = $ProgressContainer/ProgressDisplay/CascadeProgress
 @onready var stats_label: Label = $ProgressContainer/StatsLabel
@@ -145,24 +146,38 @@ func _process(_delta: float) -> void:
 
 func _on_quantum_core_pressed() -> void:
 	tap_sound.play()
-	
+
 	Gm.add_quanta(Gm.quanta_per_tap)
+
 	particle_effect.emitting = true
 	particle_effect.one_shot = true
 	#await get_tree().create_timer(0.5).timeout
 	#particle_effect.emitting = false
-	
+
 	# Create tween for animation
 	var tween = create_tween().set_parallel(true)
 	# Scale pulse: grow to 1.1x and back
-	tween.tween_property(quantum_core, "scale", Vector2(1.1, 1.1), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(quantum_core, "scale", Vector2(1.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
+	tween.tween_property(quantum_core_2d, "scale", Vector2(1.1, 1.1), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(quantum_core_2d, "scale", Globals.QUANTUM_CORE_ORIGINAL_SCALE, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
 	# Glow flash: brighten modulate and back
-	tween.tween_property(quantum_core, "modulate", Color(1.5, 1.5, 2.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(quantum_core, "modulate", Color(1.0, 1.0, 1.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
+	tween.tween_property(quantum_core_2d, "modulate", Color(1.5, 1.5, 2.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(quantum_core_2d, "modulate", Color(1.0, 1.0, 1.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
 	# Rotation: slight spin
-	tween.tween_property(quantum_core, "rotation_degrees", 5.0, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(quantum_core, "rotation_degrees", 0.0, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
+	tween.tween_property(quantum_core_2d, "rotation_degrees", 5.0, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(quantum_core_2d, "rotation_degrees", 0.0, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
+
+	
+	## Create tween for animation
+	#var tween = create_tween().set_parallel(true)
+	## Scale pulse: grow to 1.1x and back
+	#tween.tween_property(quantum_core, "scale", Vector2(1.1, 1.1), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	#tween.tween_property(quantum_core, "scale", Vector2(1.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
+	## Glow flash: brighten modulate and back
+	#tween.tween_property(quantum_core, "modulate", Color(1.5, 1.5, 2.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	#tween.tween_property(quantum_core, "modulate", Color(1.0, 1.0, 1.0, 1.0), Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
+	## Rotation: slight spin
+	#tween.tween_property(quantum_core, "rotation_degrees", 5.0, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	#tween.tween_property(quantum_core, "rotation_degrees", 0.0, Globals.QUANTUM_CORE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN).set_delay(Globals.QUANTUM_CORE_TWEEN_DELAY)
 
 func _on_upgrade_pressed(upgrade_id: String) -> void:
 	if Gm.purchase_upgrade(upgrade_id):
@@ -177,6 +192,7 @@ func _on_upgrade_pressed(upgrade_id: String) -> void:
 
 func update_ui() -> void:
 	particle_effect.position = quantum_core.position + (quantum_core.size / 2)
+	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n%d" % Gm.quanta
 	cascade_progress.value = Gm.cascade_progress
 	

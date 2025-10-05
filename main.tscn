@@ -1,4 +1,4 @@
-[gd_scene load_steps=96 format=3 uid="uid://cyq7iemom75wj"]
+[gd_scene load_steps=97 format=3 uid="uid://cyq7iemom75wj"]
 
 [ext_resource type="Script" uid="uid://bs6o0rxqsqxcg" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://b5oe5hgj2uymx" path="res://addons/AdmobPlugin/Admob.gd" id="2_0xm2m"]
@@ -88,18 +88,10 @@
 [ext_resource type="Texture2D" uid="uid://d1ugtput6xe7a" path="res://Assets/Images/Quantum Core/frame_0076.png" id="85_nycv6"]
 [ext_resource type="Texture2D" uid="uid://d1s4i0vf56moi" path="res://Assets/Images/Quantum Core/frame_0077.png" id="86_x4ftd"]
 [ext_resource type="Texture2D" uid="uid://bcnbcm5b0tnsj" path="res://Assets/Images/Quantum Core/frame_0078.png" id="87_arf1h"]
+[ext_resource type="Script" uid="uid://pyuujoj3lk5" path="res://quantum_core_2d.gd" id="88_h6isl"]
 [ext_resource type="Texture2D" uid="uid://bem46pbaay0tc" path="res://Assets/Images/Quantum Core/frame_0079.png" id="88_s0om5"]
 [ext_resource type="Texture2D" uid="uid://bsim4ighm42ho" path="res://Assets/Images/Quantum Core/frame_0080.png" id="89_gkfde"]
 [ext_resource type="Texture2D" uid="uid://dlgeosn3otwh2" path="res://Assets/Images/Quantum Core/frame_0081.png" id="90_4qxq8"]
-
-[sub_resource type="Gradient" id="Gradient_1bvp3"]
-colors = PackedColorArray(0, 0.78431374, 1, 1, 0.78431374, 0, 1, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h2yge"]
-bg_color = Color(0.078431375, 0.078431375, 0.19607843, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1bvp3"]
-bg_color = Color(0.78431374, 0, 1, 1)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ryg4g"]
 animations = [{
@@ -352,6 +344,15 @@ animations = [{
 "speed": 24.0
 }]
 
+[sub_resource type="Gradient" id="Gradient_1bvp3"]
+colors = PackedColorArray(0, 0.78431374, 1, 1, 0.78431374, 0, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h2yge"]
+bg_color = Color(0.078431375, 0.078431375, 0.19607843, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1bvp3"]
+bg_color = Color(0.78431374, 0, 1, 1)
+
 [node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -429,6 +430,13 @@ grow_vertical = 2
 texture_normal = ExtResource("5_kek77")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="QuantumCore2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(185, 411)
+scale = Vector2(0.88, 0.88)
+sprite_frames = SubResource("SpriteFrames_ryg4g")
+speed_scale = 0.5
+script = ExtResource("88_h6isl")
 
 [node name="ParticleEffect" type="CPUParticles2D" parent="."]
 position = Vector2(180, 400)
@@ -543,9 +551,3 @@ initial_cost = 500
 cost = 500
 max_level = 4
 texture = ExtResource("9_4c57u")
-
-[node name="QuantumCore2D" type="AnimatedSprite2D" parent="."]
-visible = false
-sprite_frames = SubResource("SpriteFrames_ryg4g")
-frame_progress = 0.97928095
-speed_scale = 2.0
