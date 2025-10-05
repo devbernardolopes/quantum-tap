@@ -354,7 +354,7 @@ animations = [{
 
 [node name="Main" type="Control"]
 layout_mode = 3
-anchor_top = 0.2
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -411,16 +411,6 @@ texture_normal = ExtResource("5_n5t1e")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="ParticleEffect" type="CPUParticles2D" parent="."]
-position = Vector2(180, 400)
-amount = 50
-lifetime = 0.25
-draw_order = 1
-emission_shape = 2
-emission_sphere_radius = 80.0
-color_ramp = SubResource("Gradient_1bvp3")
-metadata/_edit_lock_ = true
-
 [node name="QuantumCore" type="TextureButton" parent="."]
 modulate = Color(1.2, 1.2, 1.5, 1)
 custom_minimum_size = Vector2(384, 384)
@@ -439,6 +429,22 @@ grow_vertical = 2
 texture_normal = ExtResource("5_kek77")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="ParticleEffect" type="CPUParticles2D" parent="."]
+position = Vector2(180, 400)
+amount = 50
+lifetime = 0.25
+draw_order = 1
+emission_shape = 2
+emission_sphere_radius = 128.0
+direction = Vector2(1, 1)
+spread = 90.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 22.0
+initial_velocity_max = 22.0
+scale_amount_max = 6.0
+color_ramp = SubResource("Gradient_1bvp3")
+metadata/_edit_lock_ = true
 
 [node name="CurrencyDisplay" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -462,9 +468,9 @@ horizontal_alignment = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
-anchor_top = 0.7
+anchor_top = 0.8
 anchor_right = 0.9
-anchor_bottom = 0.7
+anchor_bottom = 0.9
 alignment = 1
 
 [node name="ProgressDisplay" type="MarginContainer" parent="ProgressContainer"]

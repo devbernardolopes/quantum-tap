@@ -148,8 +148,9 @@ func _on_quantum_core_pressed() -> void:
 	
 	Gm.add_quanta(Gm.quanta_per_tap)
 	particle_effect.emitting = true
-	await get_tree().create_timer(0.5).timeout
-	particle_effect.emitting = false
+	particle_effect.one_shot = true
+	#await get_tree().create_timer(0.5).timeout
+	#particle_effect.emitting = false
 	
 	# Create tween for animation
 	var tween = create_tween().set_parallel(true)
