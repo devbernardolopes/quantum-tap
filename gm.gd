@@ -206,3 +206,9 @@ func format_number(value: int, delimiter: String) -> String:
 		result = "-" + result
 
 	return result
+
+func get_normalized_value(current: float, max_input: float, min_output: float, max_output: float) -> float:
+	if max_input == 0.0:
+		return min_output  # Avoid division by zero
+	var ratio: float = clamp(current / max_input, 0.0, 1.0)
+	return lerp(min_output, max_output, ratio)

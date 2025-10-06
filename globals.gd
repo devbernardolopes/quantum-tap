@@ -57,14 +57,15 @@ const ACCELERATOR_MAX_LEVEL: int = 25
 const STABILIZER_INITIAL_COST: int = 200
 const STABILIZER_COST: int = 200
 const STABILIZER_LEVEL: int = 0
-const STABILIZER_MAX_LEVEL: int = 10
+const STABILIZER_MAX_LEVEL: int = 15
 
 const SHIFT_INITIAL_COST: int = 500
 const SHIFT_COST: int = 500
 const SHIFT_LEVEL: int = 0
-const SHIFT_MAX_LEVEL: int = 4
+const SHIFT_MAX_LEVEL: int = 6
 
 #const QUANTA_GOAL: int = 9223372036854775807
-const QUANTA_GOAL: int = 1000
+#const QUANTA_GOAL: int = 1000
+const QUANTA_GOAL: int = 775807
 
-const CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED: float = 1.0 # radians per second
+const CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED: float = 0.05 # radians per second

@@ -464,7 +464,7 @@ stretch_mode = 5
 position = Vector2(185, 411)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_ryg4g")
-frame_progress = 0.2205065
+frame_progress = 0.5547486
 speed_scale = 0.5
 script = ExtResource("88_h6isl")
 
@@ -580,7 +580,7 @@ upgrade_name = "Quantum Stabilizer"
 description = "+1 Quanta/sec"
 initial_cost = 200
 cost = 200
-max_level = 10
+max_level = 15
 texture = ExtResource("8_kek77")
 
 [node name="Upgrade3" parent="UpgradesContainer/GridContainer" instance=ExtResource("7_272bh")]
@@ -590,5 +590,5 @@ upgrade_name = "Dimensional Shift"
 description = "x2 Multiplier"
 initial_cost = 500
 cost = 500
-max_level = 4
+max_level = 6
 texture = ExtResource("9_4c57u")

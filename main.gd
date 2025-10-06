@@ -23,7 +23,7 @@ extends Control
 @onready var new_game: TextureButton = $NewGame
 @onready var ad_boost: TextureButton = $AdBoost
 
-var circular_cascade_timer: Timer = null
+var circular_cascade_progress_rotation_speed: float = 0.0
 
 var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
@@ -89,11 +89,7 @@ func _ready() -> void:
 	#setup_cascade_progress()
 	
 	particle_effect.emitting = false
-
-	# Timers
-	circular_cascade_timer = Timer.new()
-	
-	add_child(circular_cascade_timer)
+	quantum_core.grab_focus()
 
 	# Update initial UI
 	update_ui()
@@ -159,12 +155,13 @@ func _process(_delta: float) -> void:
 		var _material: ShaderMaterial = circular_cascade_progress.material
 		if _material:
 			var rotation_offset: float = _material.get_shader_parameter("rotation_offset")
-			rotation_offset += Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED * _delta
+			rotation_offset += circular_cascade_progress_rotation_speed * _delta
 
 			if rotation_offset >= TAU:
 				rotation_offset -= TAU
 
 			_material.set_shader_parameter("rotation_offset", rotation_offset)
+			#_material.set_shader_parameter("ring_thickness", rotation_offset)
 
 	update_ui()
 
@@ -426,15 +423,8 @@ func _on_ad_boost_pressed() -> void:
 				#reset_game()
 
 func _on_quanta_changed(new_value: int) -> void:
-	if background:
-		var quanta_normalized_value: float = float(new_value) / float(Globals.QUANTA_GOAL)
-		#var background_material: ShaderMaterial = background.material
-		#if background_material:
-			#if quanta_normalized_value < 0.05:
-				#quanta_normalized_value = 0.05
-			#background_material.set_shader_parameter("base_scroll_speed", quanta_normalized_value)
-		print(str(quanta_normalized_value))
-			#background_material.set_shader_parameter("additional_scroll_speed", quanta_normalized_value)
+	circular_cascade_progress_rotation_speed = Gm.get_normalized_value(new_value, Globals.QUANTA_GOAL, Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED, 6.28)
+	print(str(circular_cascade_progress_rotation_speed))
 
 func _on_cascade_progress_value_changed(value: float) -> void:
 	if circular_cascade_progress.material:
