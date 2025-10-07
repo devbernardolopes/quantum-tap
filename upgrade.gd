@@ -49,8 +49,6 @@ func _ready() -> void:
 		info_label.add_theme_font_override("font", Globals.UI_FONT_LIGHT)
 		info_label.add_theme_font_size_override("font_size", Globals.UPGRADE_INFO_FONT_SIZE)
 
-	
-
 	update_ui()
 
 func _notification(what: int) -> void:
@@ -62,6 +60,11 @@ func set_enabled(enabled: bool) -> void:
 		if level < max_level:
 			icon_button.disabled = not enabled
 			icon_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if enabled else Color(0.502, 0.502, 0.502, 1.0)
+			
+			if enabled:
+				if upgrade_id == Globals.STABILIZER_ID:
+					if !Gm.has_character_video_quantum_stabilizer_info_played:
+						Gm.play_character_video_quantum_stabilizer_info = true
 		else:
 			icon_button.disabled = true
 

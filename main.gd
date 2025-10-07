@@ -9,21 +9,25 @@ extends Control
 @onready var quanta_label = $CurrencyDisplay/QuantaLabel
 
 @onready var quantum_core: TextureButton = $QuantumCore
-@onready var particle_effect = $ParticleEffect
 @onready var quantum_core_2d: AnimatedSprite2D = $QuantumCore2D
+
+@onready var particle_effect = $ParticleEffect
+@onready var particle_effect_2: CPUParticles2D = $ParticleEffect2
 
 @onready var circular_cascade_progress: ColorRect = $CircularCascadeProgress
 @onready var cascade_progress: ProgressBar = $ProgressContainer/ProgressDisplay/CascadeProgress
-@onready var stats_label: Label = $ProgressContainer/StatsLabel
 
-@onready var upgrade1 = $UpgradesContainer/GridContainer/Upgrade1
-@onready var upgrade2 = $UpgradesContainer/GridContainer/Upgrade2
-@onready var upgrade3 = $UpgradesContainer/GridContainer/Upgrade3
+@onready var upgrade1 = $UpgradesContainer/Upgrade1
+@onready var upgrade2 = $UpgradesContainer/Upgrade2
+@onready var upgrade3 = $UpgradesContainer/Upgrade3
 
-@onready var new_game: TextureButton = $NewGame
-@onready var ad_boost: TextureButton = $AdBoost
+@onready var new_game: TextureButton = $TopMenu/NewGame
+@onready var ad_boost: TextureButton = $TopMenu/AdBoost
+
+@onready var character_video: VideoStreamPlayer = $CharacterVideo
 
 var circular_cascade_progress_rotation_speed: float = 0.0
+var circular_cascade_progress_ring_thickness: float = 0.01
 
 var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
@@ -69,6 +73,8 @@ func _ready() -> void:
 	new_game.pressed.connect(_on_new_game_pressed)
 	ad_boost.pressed.connect(_on_ad_boost_pressed)
 	
+	character_video.finished.connect(_on_character_video_finished)
+	
 	upgrade1.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("accelerator"))
 	upgrade2.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("stabilizer"))
 	upgrade3.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("shift"))
@@ -81,17 +87,21 @@ func _ready() -> void:
 	quanta_label.add_theme_font_override("font", Globals.QUANTA_LABEL_FONT)
 	quanta_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_NORMAL)
 
-	stats_label.add_theme_font_override("font", Globals.UI_FONT_REGULAR)
-	stats_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_NORMAL)
-
 	cascade_progress.value_changed.connect(_on_cascade_progress_value_changed)
 	setup_cascade_progress_bar()
 	#setup_cascade_progress()
 	
 	particle_effect.emitting = false
+	particle_effect_2.emitting = false
 	quantum_core.grab_focus()
+	
+	character_video.visible = false
+	cascade_progress.value = 0
+
+	update_circular_cascade_progress(0)
 
 	# Update initial UI
+	#reset_game()
 	update_ui()
 
 func load_banner_ad() -> void:
@@ -163,6 +173,15 @@ func _process(_delta: float) -> void:
 			_material.set_shader_parameter("rotation_offset", rotation_offset)
 			#_material.set_shader_parameter("ring_thickness", rotation_offset)
 
+	if Gm.play_character_video_quantum_stabilizer_info:
+		if !Gm.has_character_video_quantum_stabilizer_info_played:
+			if character_video:
+				if !character_video.is_playing():
+					character_video.stream = Globals.ALIX_QUANTUM_STABILIZER_INFO
+					character_video.visible = true
+					character_video.play()
+					Gm.has_character_video_quantum_stabilizer_info_played = true
+
 	update_ui()
 
 func _on_quantum_core_pressed() -> void:
@@ -172,8 +191,8 @@ func _on_quantum_core_pressed() -> void:
 
 	particle_effect.emitting = true
 	particle_effect.one_shot = true
-	#await get_tree().create_timer(0.5).timeout
-	#particle_effect.emitting = false
+	particle_effect_2.emitting = true
+	particle_effect_2.one_shot = true
 
 	# Create tween for animation
 	var tween = create_tween().set_parallel(true)
@@ -213,6 +232,7 @@ func _on_upgrade_pressed(upgrade_id: String) -> void:
 
 func update_ui() -> void:
 	particle_effect.position = quantum_core.position + (quantum_core.size / 2)
+	particle_effect_2.position = quantum_core.position + (quantum_core.size / 2)
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
@@ -228,10 +248,6 @@ func update_ui() -> void:
 	upgrade1.update_ui()
 	upgrade2.update_ui()
 	upgrade3.update_ui()
-	
-	if stats_label:
-		stats_label.text = "\nq/t: %d, q/s: %d, m: %d" % [Gm.quanta_per_tap, Gm.quanta_per_second, Gm.multiplier]
-		stats_label.visible = false
 
 func create_gradient_fill() -> StyleBoxTexture:
 	var _size: Vector2i = cascade_progress.size # Vector2i(256, cascade_progress.size.y)  # base texture size; adjust to your bar height
@@ -321,8 +337,8 @@ func setup_cascade_progress_bar() -> void:
 	cascade_progress.add_theme_stylebox_override("background", bg)
 	cascade_progress.add_theme_stylebox_override("fill", fill)
 
-	cascade_progress.add_theme_font_override("font", Globals.UI_FONT_BOLD)
-	cascade_progress.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_LARGE)
+	cascade_progress.add_theme_font_override("font", Globals.CASCADE_PROGRESS_FONT)
+	cascade_progress.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_SMALLER)
 	#var tw = create_tween()
 	#tw.tween_property(fill, "bg_color", Color(0.4, 0.8, 1.0), 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	#tw.set_loops()
@@ -424,11 +440,26 @@ func _on_ad_boost_pressed() -> void:
 
 func _on_quanta_changed(new_value: int) -> void:
 	circular_cascade_progress_rotation_speed = Gm.get_normalized_value(new_value, Globals.QUANTA_GOAL, Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED, 6.28)
-	print(str(circular_cascade_progress_rotation_speed))
+	#print(str(circular_cascade_progress_rotation_speed))
 
-func _on_cascade_progress_value_changed(value: float) -> void:
+func update_circular_cascade_progress(value: float) -> void:
 	if circular_cascade_progress.material:
-		var normalized_value: float = cascade_progress.value / cascade_progress.max_value
 		var _material: ShaderMaterial = circular_cascade_progress.material
 		if _material:
-			_material.set_shader_parameter("progress", normalized_value)
+			_material.set_shader_parameter("progress", Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0))
+			_material.set_shader_parameter("ring_thickness", Gm.get_normalized_value(value, cascade_progress.max_value, Globals.CIRCULAR_CASCADE_PROGRESS_MINIMUM_RING_THICKNESS, Globals.CIRCULAR_CASCADE_PROGRESS_MAXIMUM_RING_THICKNESS))
+
+func _on_cascade_progress_value_changed(value: float) -> void:
+	if character_video:
+		if !character_video.is_playing():
+			if Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0) >= 0.8:
+				if !Gm.has_character_video_pre_cascade_played_this_cascade:
+					character_video.visible = true
+					character_video.stream = Globals.ALIX_PRE_CASCADE
+					character_video.play()
+					Gm.has_character_video_pre_cascade_played_this_cascade = true
+
+	update_circular_cascade_progress(value)
+
+func _on_character_video_finished() -> void:
+	character_video.visible = false

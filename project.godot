@@ -10,10 +10,11 @@ config_version=5
 
 [application]
 
-config/name="ClickerGame"
+config/name="Quantum Tap"
 run/main_scene="uid://cyq7iemom75wj"
 config/features=PackedStringArray("4.5", "Mobile")
-config/icon="uid://ii3pbodpfwdy"
+boot_splash/show_image=false
+config/icon="uid://dbvfcoxvhh1lg"
 
 [autoload]
 

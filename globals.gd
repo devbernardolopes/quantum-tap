@@ -1,5 +1,6 @@
 class_name Globals
 
+const UI_FONT_SIZE_SMALLER: int = 12
 const UI_FONT_SIZE_SMALL: int = 14
 const UI_FONT_SIZE_NORMAL: int = 20
 const UI_FONT_SIZE_LARGE: int = 24
@@ -14,6 +15,10 @@ const UI_FONT_REGULAR := preload("res://Assets/Fonts/ClearSans-Regular.ttf")
 const UI_FONT_BOLD := preload("res://Assets/Fonts/ClearSans-Bold.ttf")
 
 const QUANTA_LABEL_FONT := FONT_KENNEY_FUTURE
+const CASCADE_PROGRESS_FONT := FONT_KENNEY_FUTURE
+
+const ALIX_PRE_CASCADE := preload("res://Assets/Videos/Characters/Alix/pre-cascade.ogv")
+const ALIX_QUANTUM_STABILIZER_INFO := preload("res://Assets/Videos/Characters/Alix/quantum-stabilizer-info.ogv")
 
 const CORNER_RADIUS: int = 16
 const HORIZONTAL_CORNER_RADIUS: int = 8
@@ -21,7 +26,7 @@ const VERTICAL_CORNER_RADIUS: int = 8
 
 const MIN_CASCADE_THRESHOLD: float = 100.0
 const MAX_CASCADE_THRESHOLD: float = 100000.0
-const CASCADE_THRESHOLD_MULTIPLIER: int = 10
+const CASCADE_THRESHOLD_MULTIPLIER: int = 2
 
 const QUANTA_LABEL_TEXT: String = "QUANTA"
 
@@ -37,7 +42,7 @@ const UPGRADE_MULTIPLIER: float = 1.5
 const UPGRADE_INCREMENT: float = 50.0
 const UPGRADE_BASE_LOG: float = 10.0
 
-const UPGRADE_PROGRESSION: UPGRADE_PROGRESSION_FORMULA = UPGRADE_PROGRESSION_FORMULA.QUADRATIC
+const UPGRADE_PROGRESSION: UPGRADE_PROGRESSION_FORMULA = UPGRADE_PROGRESSION_FORMULA.LOGARITHMIC
 
 enum UPGRADE_PROGRESSION_FORMULA {
 	LINEAR,
@@ -48,17 +53,19 @@ enum UPGRADE_PROGRESSION_FORMULA {
 	LOGARITHMIC
 }
 
-const ACCELERATOR_DESCRIPTION: String = "+%d Quanta/tap"
+const ACCELERATOR_ID: String = "accelerator"
 const ACCELERATOR_INITIAL_COST: int = 50
 const ACCELERATOR_COST: int = 50
 const ACCELERATOR_LEVEL: int = 0
 const ACCELERATOR_MAX_LEVEL: int = 25
 
+const STABILIZER_ID: String = "stabilizer"
 const STABILIZER_INITIAL_COST: int = 200
 const STABILIZER_COST: int = 200
 const STABILIZER_LEVEL: int = 0
 const STABILIZER_MAX_LEVEL: int = 15
 
+const SHIFT_ID: String = "shift"
 const SHIFT_INITIAL_COST: int = 500
 const SHIFT_COST: int = 500
 const SHIFT_LEVEL: int = 0
@@ -69,3 +76,5 @@ const SHIFT_MAX_LEVEL: int = 6
 const QUANTA_GOAL: int = 775807
 
 const CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED: float = 0.05 # radians per second
+const CIRCULAR_CASCADE_PROGRESS_MINIMUM_RING_THICKNESS: float = 0.01
+const CIRCULAR_CASCADE_PROGRESS_MAXIMUM_RING_THICKNESS: float = 0.07

@@ -19,10 +19,15 @@ var quanta_accumulator: float = 0.0
 var cascade_progress: float = 0.0
 var cascade_threshold: float = Globals.MIN_CASCADE_THRESHOLD
 
+var has_character_video_pre_cascade_played_this_cascade: bool = false
+
+var has_character_video_quantum_stabilizer_info_played: bool = false
+var play_character_video_quantum_stabilizer_info: bool = false
+
 var upgrades: Dictionary = {
-	"accelerator": {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
-	"stabilizer": {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
-	"shift": {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
+	Globals.ACCELERATOR_ID: {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
+	Globals.STABILIZER_ID: {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
+	Globals.SHIFT_ID: {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
 }
 
 signal game_state_updated
@@ -57,7 +62,7 @@ func get_upgrade_cost(initial_cost: int, cost: int, level: int, formula: Globals
 	
 	match formula:
 		Globals.UPGRADE_PROGRESSION_FORMULA.QUADRATIC:
-			return int(cost + Globals.UPGRADE_INCREMENT * pow((level + 1), 2))
+			return int(initial_cost + Globals.UPGRADE_INCREMENT * pow(level, 2))
 
 		Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL:
 			return int(cost * Globals.UPGRADE_MULTIPLIER)
@@ -66,22 +71,38 @@ func get_upgrade_cost(initial_cost: int, cost: int, level: int, formula: Globals
 			return int(cost * (1.2 + (0.1 * level)))
 
 		Globals.UPGRADE_PROGRESSION_FORMULA.LOGARITHMIC:
-			return int(initial_cost * log(Globals.UPGRADE_BASE_LOG + level))
+			return int(initial_cost * (1.0 + 1.5 * (log(Globals.UPGRADE_BASE_LOG + level) / log(Globals.UPGRADE_BASE_LOG))))
+			#return int(initial_cost * log(Globals.UPGRADE_BASE_LOG + level))
 
 		Globals.UPGRADE_PROGRESSION_FORMULA.FIBONACCI_LIKE:
 			pass
 
 	return result
 
+func get_upgrade_cost_v2(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
+	var difficulty_scale := 1.0 + (float(max_level) / 10.0) # Higher max_level = softer curve
+	var exponent := 1.5 + (6.0 - float(max_level)) * 0.1   # Lower max_level = steeper curve
+	var growth := base_cost * 0.2                          # Cost grows ~20% of base per step
+	return int(current_cost + growth * pow(level + 1, exponent) / difficulty_scale)
+
+func get_upgrade_cost_v3(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
+	# Base growth: % of starting cost
+	var growth := base_cost * 0.2
+	
+	# Exponent: ensures lower max-level upgrades grow faster
+	var exponent := 1.5 + (6.0 / max_level)  # Always >1.0
+	
+	# Optional: scale down slightly for high max-level upgrades
+	var scale := 1.0 + (max_level / 25.0)   # scale >1 for high max-levels
+	
+	return int(current_cost + growth * pow(level + 1, exponent) / scale)
+
 func purchase_upgrade(upgrade_id: String) -> bool:
 	var upgrade = upgrades[upgrade_id]
 	if quanta >= upgrade.cost:
 		quanta -= upgrade.cost
-		#upgrade.level += 1
 		upgrade.level = min(upgrade.level + 1, upgrade.max_level)
-		upgrade.cost = get_upgrade_cost(upgrade.initial_cost, upgrade.cost, upgrade.level, Globals.UPGRADE_PROGRESSION)
-		#upgrade.cost = int(upgrade.cost + Globals.UPGRADE_INCREMENT * pow(upgrade.level, 2))
-		#upgrade.cost = int(upgrade.cost * Globals.UPGRADE_COST_MULTIPLIER) # Cost increases by 50% per level
+		upgrade.cost = get_upgrade_cost_v3(upgrade.cost, upgrade.level, upgrade.max_level, upgrade.initial_cost)
 		upgrade.effect.call()
 		return true
 	return false
@@ -93,6 +114,7 @@ func trigger_cascade() -> void:
 	cascade_threshold *= Globals.CASCADE_THRESHOLD_MULTIPLIER
 	cascade_threshold = min(cascade_threshold, Globals.MAX_CASCADE_THRESHOLD)
 	set_progress_bar_max_value(cascade_threshold)
+	has_character_video_pre_cascade_played_this_cascade = false
 
 func save_game() -> void:
 	var config = ConfigFile.new()
@@ -103,7 +125,10 @@ func save_game() -> void:
 	config.set_value("game", "cascade_progress", cascade_progress)
 	config.set_value("game", "cascade_threshold", cascade_threshold)
 	config.set_value("game", "quanta_accumulator", quanta_accumulator)
-	
+	config.set_value("game", "has_character_video_pre_cascade_played_this_cascade", has_character_video_pre_cascade_played_this_cascade)
+	config.set_value("game", "has_character_video_quantum_stabilizer_info_played", has_character_video_quantum_stabilizer_info_played)
+	config.set_value("game", "play_character_video_quantum_stabilizer_info", play_character_video_quantum_stabilizer_info)
+
 	for upgrade_id in upgrades:
 		var upgrade = upgrades[upgrade_id]
 		config.set_value("upgrades", upgrade_id + "_initial_cost", upgrade.initial_cost)
@@ -128,6 +153,9 @@ func load_game() -> void:
 	cascade_progress = config.get_value("game", "cascade_progress", 0.0)
 	cascade_threshold = config.get_value("game", "cascade_threshold", 0.0)
 	quanta_accumulator = config.get_value("game", "quanta_accumulator", 0.0)
+	has_character_video_pre_cascade_played_this_cascade = config.get_value("game", "has_character_video_pre_cascade_played_this_cascade", true)
+	has_character_video_quantum_stabilizer_info_played = config.get_value("game", "has_character_video_quantum_stabilizer_info_played", true)
+	play_character_video_quantum_stabilizer_info = config.get_value("game", "play_character_video_quantum_stabilizer_info", false)
 	
 	for upgrade_id in upgrades:
 		var upgrade = upgrades[upgrade_id]
@@ -147,6 +175,10 @@ func load_game() -> void:
 
 func reset_game() -> void:
 	# Reset game state to initial values
+	has_character_video_pre_cascade_played_this_cascade = false
+	has_character_video_quantum_stabilizer_info_played = false
+	play_character_video_quantum_stabilizer_info = false
+
 	quanta = 0
 	quanta_per_tap = 1
 	quanta_per_second = 0
@@ -155,9 +187,9 @@ func reset_game() -> void:
 	cascade_threshold = Globals.MIN_CASCADE_THRESHOLD
 	quanta_accumulator = 0.0
 	upgrades = {
-		"accelerator": {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
-		"stabilizer": {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
-		"shift": {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
+		Globals.ACCELERATOR_ID: {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
+		Globals.STABILIZER_ID: {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
+		Globals.SHIFT_ID: {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
 	}
 	set_progress_bar_max_value(cascade_threshold)
 	
@@ -176,7 +208,7 @@ func set_progress_bar_max_value(new_max_value: float):
 	
 	# Assuming 'Main' is the root of your main scene and 'CascadeProgress' is a direct child 
 	# OR you know the full path (e.g., "Main/CascadeProgress")
-	var progress_bar = root.get_node("Main/ProgressContainer/ProgressDisplay/CascadeProgress")
+	var progress_bar: ProgressBar = root.get_node("Main/ProgressContainer/ProgressDisplay/CascadeProgress")
 	
 	# A safer way to find the node anywhere in the current scene tree's children:
 	# var progress_bar = root.find_node("CascadeProgress", true, false)
@@ -184,6 +216,8 @@ func set_progress_bar_max_value(new_max_value: float):
 	if progress_bar and progress_bar is ProgressBar:
 		# Change the max_value property
 		progress_bar.max_value = new_max_value
+		progress_bar.value = cascade_progress
+		print(str(cascade_progress))
 		print("Updated CascadeProgress max_value to: ", new_max_value)
 	else:
 		# This will help debug if the node is not found or is the wrong type
