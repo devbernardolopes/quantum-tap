@@ -21,8 +21,12 @@ var cascade_threshold: float = Globals.MIN_CASCADE_THRESHOLD
 
 var has_character_video_pre_cascade_played_this_cascade: bool = false
 
+var has_character_video_particle_accelerator_info_played: bool = false
+var play_character_video_particle_accelerator_info: bool = false
 var has_character_video_quantum_stabilizer_info_played: bool = false
 var play_character_video_quantum_stabilizer_info: bool = false
+var has_character_video_dimensional_shift_info_played: bool = false
+var play_character_video_dimensional_shift_info: bool = false
 
 var upgrades: Dictionary = {
 	Globals.ACCELERATOR_ID: {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
@@ -49,7 +53,7 @@ func _process(delta: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		save_game()
-		
+
 func add_quanta(amount: int) -> void:
 	quanta += int(amount * multiplier)
 	#quanta += int(amount)
@@ -118,7 +122,7 @@ func trigger_cascade() -> void:
 
 func save_game() -> void:
 	var config = ConfigFile.new()
-	config.set_value("game", "quanta", quanta)
+	config.set_value("game" , "quanta", quanta)
 	config.set_value("game", "quanta_per_tap", quanta_per_tap)
 	config.set_value("game", "quanta_per_second", quanta_per_second)
 	config.set_value("game", "multiplier", multiplier)
@@ -126,8 +130,12 @@ func save_game() -> void:
 	config.set_value("game", "cascade_threshold", cascade_threshold)
 	config.set_value("game", "quanta_accumulator", quanta_accumulator)
 	config.set_value("game", "has_character_video_pre_cascade_played_this_cascade", has_character_video_pre_cascade_played_this_cascade)
+	config.set_value("game", "has_character_video_particle_accelerator_info_played", has_character_video_particle_accelerator_info_played)
+	config.set_value("game", "play_character_video_particle_accelerator_info", play_character_video_particle_accelerator_info)
 	config.set_value("game", "has_character_video_quantum_stabilizer_info_played", has_character_video_quantum_stabilizer_info_played)
 	config.set_value("game", "play_character_video_quantum_stabilizer_info", play_character_video_quantum_stabilizer_info)
+	config.set_value("game", "has_character_video_dimensional_shift_info_played", has_character_video_dimensional_shift_info_played)
+	config.set_value("game", "play_character_video_dimensional_shift_info", play_character_video_dimensional_shift_info)
 
 	for upgrade_id in upgrades:
 		var upgrade = upgrades[upgrade_id]
@@ -154,8 +162,12 @@ func load_game() -> void:
 	cascade_threshold = config.get_value("game", "cascade_threshold", 0.0)
 	quanta_accumulator = config.get_value("game", "quanta_accumulator", 0.0)
 	has_character_video_pre_cascade_played_this_cascade = config.get_value("game", "has_character_video_pre_cascade_played_this_cascade", true)
+	has_character_video_particle_accelerator_info_played = config.get_value("game", "has_character_video_particle_accelerator_info_played", true)
+	play_character_video_particle_accelerator_info = config.get_value("game", "play_character_video_particle_accelerator_info", false)
 	has_character_video_quantum_stabilizer_info_played = config.get_value("game", "has_character_video_quantum_stabilizer_info_played", true)
 	play_character_video_quantum_stabilizer_info = config.get_value("game", "play_character_video_quantum_stabilizer_info", false)
+	has_character_video_dimensional_shift_info_played = config.get_value("game", "has_character_video_dimensional_shift_info_played", true)
+	play_character_video_dimensional_shift_info = config.get_value("game", "play_character_video_dimensional_shift_info", false)
 	
 	for upgrade_id in upgrades:
 		var upgrade = upgrades[upgrade_id]
@@ -176,8 +188,13 @@ func load_game() -> void:
 func reset_game() -> void:
 	# Reset game state to initial values
 	has_character_video_pre_cascade_played_this_cascade = false
+
+	has_character_video_particle_accelerator_info_played = false
+	play_character_video_particle_accelerator_info = false
 	has_character_video_quantum_stabilizer_info_played = false
 	play_character_video_quantum_stabilizer_info = false
+	has_character_video_dimensional_shift_info_played = false
+	play_character_video_dimensional_shift_info = false
 
 	quanta = 0
 	quanta_per_tap = 1
@@ -217,11 +234,11 @@ func set_progress_bar_max_value(new_max_value: float):
 		# Change the max_value property
 		progress_bar.max_value = new_max_value
 		progress_bar.value = cascade_progress
-		print(str(cascade_progress))
-		print("Updated CascadeProgress max_value to: ", new_max_value)
-	else:
-		# This will help debug if the node is not found or is the wrong type
-		print("Error: Could not find ProgressBar node named 'CascadeProgress'.")
+		#print(str(cascade_progress))
+		#print("Updated CascadeProgress max_value to: ", new_max_value)
+	#else:
+		## This will help debug if the node is not found or is the wrong type
+		#print("Error: Could not find ProgressBar node named 'CascadeProgress'.")
 
 func format_number(value: int, delimiter: String) -> String:
 	var str_val := str(abs(value))

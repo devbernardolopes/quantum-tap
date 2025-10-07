@@ -55,16 +55,17 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_EDITOR_PRE_SAVE:
 		update_ui()
 
+func is_enabled() -> bool:
+	var result: bool = false
+	if icon_button:
+		result = !icon_button.disabled
+	return result
+
 func set_enabled(enabled: bool) -> void:
 	if icon_button:
 		if level < max_level:
 			icon_button.disabled = not enabled
 			icon_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if enabled else Color(0.502, 0.502, 0.502, 1.0)
-			
-			if enabled:
-				if upgrade_id == Globals.STABILIZER_ID:
-					if !Gm.has_character_video_quantum_stabilizer_info_played:
-						Gm.play_character_video_quantum_stabilizer_info = true
 		else:
 			icon_button.disabled = true
 

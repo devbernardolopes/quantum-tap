@@ -17,8 +17,20 @@ const UI_FONT_BOLD := preload("res://Assets/Fonts/ClearSans-Bold.ttf")
 const QUANTA_LABEL_FONT := FONT_KENNEY_FUTURE
 const CASCADE_PROGRESS_FONT := FONT_KENNEY_FUTURE
 
+#region ALIX DIALOGUES
+## We are close to a breakthrough. Accelerate production to trigger the cascade!
 const ALIX_PRE_CASCADE := preload("res://Assets/Videos/Characters/Alix/pre-cascade.ogv")
+
+## The Particle Accelerator will provide us with extra Quanta per action.
+const ALIX_PARTICLE_ACCELERATOR_INFO := preload("res://Assets/Videos/Characters/Alix/particle-acccelerator-info.ogv")
+
+## We must rely on the Quantum Stabilizer for passive Quanta generation.
 const ALIX_QUANTUM_STABILIZER_INFO := preload("res://Assets/Videos/Characters/Alix/quantum-stabilizer-info.ogv")
+
+## Dimensional shift detected. It will double our efforts.
+const ALIX_DIMENSIONAL_SHIFT_INFO := preload("res://Assets/Videos/Characters/Alix/dimensional-shift-info.ogv")
+
+#endregion
 
 const CORNER_RADIUS: int = 16
 const HORIZONTAL_CORNER_RADIUS: int = 8

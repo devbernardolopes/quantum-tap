@@ -564,6 +564,7 @@ offset_top = 576.0
 offset_right = 244.0
 offset_bottom = 704.0
 pivot_offset = Vector2(64, 64)
+mouse_filter = 2
 expand = true
 metadata/_edit_lock_ = true
 

@@ -173,6 +173,27 @@ func _process(_delta: float) -> void:
 			_material.set_shader_parameter("rotation_offset", rotation_offset)
 			#_material.set_shader_parameter("ring_thickness", rotation_offset)
 
+	if upgrade1.is_enabled():
+		if !Gm.has_character_video_particle_accelerator_info_played:
+			Gm.play_character_video_particle_accelerator_info = true
+
+	if upgrade2.is_enabled():
+		if !Gm.has_character_video_quantum_stabilizer_info_played:
+			Gm.play_character_video_quantum_stabilizer_info = true
+
+	if upgrade3.is_enabled():
+		if !Gm.has_character_video_dimensional_shift_info_played:
+			Gm.play_character_video_dimensional_shift_info = true
+
+	if Gm.play_character_video_particle_accelerator_info:
+		if !Gm.has_character_video_particle_accelerator_info_played:
+			if character_video:
+				if !character_video.is_playing():
+					character_video.stream = Globals.ALIX_PARTICLE_ACCELERATOR_INFO
+					character_video.visible = true
+					character_video.play()
+					Gm.has_character_video_particle_accelerator_info_played = true
+
 	if Gm.play_character_video_quantum_stabilizer_info:
 		if !Gm.has_character_video_quantum_stabilizer_info_played:
 			if character_video:
@@ -181,6 +202,15 @@ func _process(_delta: float) -> void:
 					character_video.visible = true
 					character_video.play()
 					Gm.has_character_video_quantum_stabilizer_info_played = true
+
+	if Gm.play_character_video_dimensional_shift_info:
+		if !Gm.has_character_video_dimensional_shift_info_played:
+			if character_video:
+				if !character_video.is_playing():
+					character_video.stream = Globals.ALIX_DIMENSIONAL_SHIFT_INFO
+					character_video.visible = true
+					character_video.play()
+					Gm.has_character_video_dimensional_shift_info_played = true
 
 	update_ui()
 
@@ -234,6 +264,7 @@ func update_ui() -> void:
 	particle_effect.position = quantum_core.position + (quantum_core.size / 2)
 	particle_effect_2.position = quantum_core.position + (quantum_core.size / 2)
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
+	character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
 	cascade_progress.value = Gm.cascade_progress
@@ -415,6 +446,11 @@ func _on_interstitial_ad_loading_timer_timeout() -> void:
 	pass
 
 func reset_game() -> void:
+	character_video.visible = false
+	if character_video.is_playing():
+		character_video.stop()
+		character_video.stream = null
+
 	Gm.reset_game()
 	update_ui()
 
@@ -452,8 +488,10 @@ func update_circular_cascade_progress(value: float) -> void:
 func _on_cascade_progress_value_changed(value: float) -> void:
 	if character_video:
 		if !character_video.is_playing():
-			if Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0) >= 0.8:
+			if Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0) >= 0.1:
 				if !Gm.has_character_video_pre_cascade_played_this_cascade:
+					#print("Cascade 80%" + " " + str(value) + " " + str(cascade_progress.max_value))
+					
 					character_video.visible = true
 					character_video.stream = Globals.ALIX_PRE_CASCADE
 					character_video.play()
