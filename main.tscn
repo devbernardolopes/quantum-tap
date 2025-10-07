@@ -1,17 +1,22 @@
-[gd_scene load_steps=101 format=3 uid="uid://cyq7iemom75wj"]
+[gd_scene load_steps=106 format=3 uid="uid://cyq7iemom75wj"]
 
 [ext_resource type="Script" uid="uid://bs6o0rxqsqxcg" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://b5oe5hgj2uymx" path="res://addons/AdmobPlugin/Admob.gd" id="2_0xm2m"]
 [ext_resource type="AudioStream" uid="uid://dsef6olbqb81e" path="res://Assets/Sounds/impactGlass_heavy_003.ogg" id="3_5vw27"]
 [ext_resource type="Shader" uid="uid://dn1i5dvuqxadu" path="res://Shaders/starfield.gdshader" id="4_53bls"]
-[ext_resource type="Texture2D" uid="uid://uw4s7cvuuqw4" path="res://Assets/Images/UI/play-button.png" id="4_kek77"]
 [ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
+[ext_resource type="Texture2D" uid="uid://cwi2hgecpmqe6" path="res://Assets/Images/UI/return.png" id="5_yjja3"]
+[ext_resource type="Texture2D" uid="uid://b6y4smaqqdo1p" path="res://Assets/Images/UI/audioOn.png" id="6_l0gw7"]
 [ext_resource type="PackedScene" uid="uid://b5a2h1nfm8k8v" path="res://Upgrade.tscn" id="7_272bh"]
+[ext_resource type="Texture2D" uid="uid://cr2ohdmtpwgm3" path="res://Assets/Images/UI/audioOff.png" id="7_inymm"]
 [ext_resource type="Texture2D" uid="uid://b4j031cciwjif" path="res://Assets/Images/Upgrades/Particle Accelerator 2.png" id="7_kek77"]
 [ext_resource type="Shader" uid="uid://bsgelfmjf24im" path="res://Shaders/circular_progress_bar.gdshader" id="8_41lik"]
+[ext_resource type="Texture2D" uid="uid://bdvnfb8bnfn2d" path="res://Assets/Images/UI/musicOn.png" id="8_jcxqu"]
 [ext_resource type="Texture2D" uid="uid://bx2nopw20ksg8" path="res://Assets/Images/Upgrades/Quantum Stabilizer 2.png" id="8_kek77"]
+[ext_resource type="Texture2D" uid="uid://bwl6h3la0qaaj" path="res://Assets/Images/UI/musicOff.png" id="9_0arob"]
 [ext_resource type="Texture2D" uid="uid://cm85uhkhkcbp1" path="res://Assets/Images/Upgrades/Dimensional Shift.png" id="9_4c57u"]
 [ext_resource type="Texture2D" uid="uid://bdvwpv45rx3wl" path="res://Assets/Images/QuantumCore/frame_0001.png" id="10_yysqy"]
+[ext_resource type="Texture2D" uid="uid://dwa10x82qcyls" path="res://Assets/Images/UI/trophy.png" id="11_dij0e"]
 [ext_resource type="Texture2D" uid="uid://bkyc1ll4yhq0g" path="res://Assets/Images/QuantumCore/frame_0002.png" id="11_n5t1e"]
 [ext_resource type="Texture2D" uid="uid://bc765r8qnl8lm" path="res://Assets/Images/QuantumCore/frame_0003.png" id="12_h6isl"]
 [ext_resource type="Texture2D" uid="uid://wp0f2pucfyr5" path="res://Assets/Images/QuantumCore/frame_0004.png" id="13_53bls"]
@@ -426,20 +431,50 @@ offset_right = -16.0
 offset_bottom = 32.0
 grow_horizontal = 2
 theme_override_constants/separation = 16
+alignment = 1
 
 [node name="NewGame" type="TextureButton" parent="TopMenu"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-texture_normal = ExtResource("4_kek77")
+texture_normal = ExtResource("5_yjja3")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AudioOnOff" type="TextureButton" parent="TopMenu"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+texture_normal = ExtResource("6_l0gw7")
+texture_pressed = ExtResource("7_inymm")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MusicOnOff" type="TextureButton" parent="TopMenu"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+texture_normal = ExtResource("8_jcxqu")
+texture_pressed = ExtResource("9_0arob")
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="AdBoost" type="TextureButton" parent="TopMenu"]
+visible = false
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
 texture_normal = ExtResource("5_n5t1e")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="StatsButton" type="TextureButton" parent="TopMenu"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("11_dij0e")
 ignore_texture_size = true
 stretch_mode = 5
 
@@ -541,7 +576,6 @@ step = 1.0
 value = 50.0
 
 [node name="ProgressContainer2" type="VBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
@@ -554,14 +588,15 @@ alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CascadeProgress" type="ProgressBar" parent="ProgressContainer2/ProgressDisplay"]
+[node name="QuantaGoalProgress" type="ProgressBar" parent="ProgressContainer2/ProgressDisplay"]
 custom_minimum_size = Vector2(288, 0)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("91_0abf2")
 theme_override_font_sizes/font_size = 12
+max_value = 9.223372e+18
 step = 1.0
-value = 50.0
+value = 4.611686e+18
 
 [node name="CurrencyDisplay" type="MarginContainer" parent="."]
 layout_mode = 1

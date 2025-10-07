@@ -61,44 +61,38 @@ func add_quanta(amount: int) -> void:
 	if cascade_progress >= cascade_threshold:
 		trigger_cascade()
 
-func get_upgrade_cost(initial_cost: int, cost: int, level: int, formula: Globals.UPGRADE_PROGRESSION_FORMULA = Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL) -> int:
-	var result: int = 0
-	
-	match formula:
-		Globals.UPGRADE_PROGRESSION_FORMULA.QUADRATIC:
-			return int(initial_cost + Globals.UPGRADE_INCREMENT * pow(level, 2))
+#func get_upgrade_cost(initial_cost: int, cost: int, level: int, formula: Globals.UPGRADE_PROGRESSION_FORMULA = Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL) -> int:
+	#var result: int = 0
+	#
+	#match formula:
+		#Globals.UPGRADE_PROGRESSION_FORMULA.QUADRATIC:
+			#return int(initial_cost + Globals.UPGRADE_INCREMENT * pow(level, 2))
+#
+		#Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL:
+			#return int(cost * Globals.UPGRADE_MULTIPLIER)
+#
+		#Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL_VAR_BASE:
+			#return int(cost * (1.2 + (0.1 * level)))
+#
+		#Globals.UPGRADE_PROGRESSION_FORMULA.LOGARITHMIC:
+			#return int(initial_cost * (1.0 + 1.5 * (log(Globals.UPGRADE_BASE_LOG + level) / log(Globals.UPGRADE_BASE_LOG))))
+			##return int(initial_cost * log(Globals.UPGRADE_BASE_LOG + level))
+#
+		#Globals.UPGRADE_PROGRESSION_FORMULA.FIBONACCI_LIKE:
+			#pass
+#
+	#return result
+#
+#func get_upgrade_cost_v2(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
+	#var difficulty_scale := 1.0 + (float(max_level) / 10.0) # Higher max_level = softer curve
+	#var exponent := 1.5 + (6.0 - float(max_level)) * 0.1   # Lower max_level = steeper curve
+	#var growth := base_cost * 0.2                          # Cost grows ~20% of base per step
+	#return int(current_cost + growth * pow(level + 1, exponent) / difficulty_scale)
 
-		Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL:
-			return int(cost * Globals.UPGRADE_MULTIPLIER)
-
-		Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL_VAR_BASE:
-			return int(cost * (1.2 + (0.1 * level)))
-
-		Globals.UPGRADE_PROGRESSION_FORMULA.LOGARITHMIC:
-			return int(initial_cost * (1.0 + 1.5 * (log(Globals.UPGRADE_BASE_LOG + level) / log(Globals.UPGRADE_BASE_LOG))))
-			#return int(initial_cost * log(Globals.UPGRADE_BASE_LOG + level))
-
-		Globals.UPGRADE_PROGRESSION_FORMULA.FIBONACCI_LIKE:
-			pass
-
-	return result
-
-func get_upgrade_cost_v2(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
-	var difficulty_scale := 1.0 + (float(max_level) / 10.0) # Higher max_level = softer curve
-	var exponent := 1.5 + (6.0 - float(max_level)) * 0.1   # Lower max_level = steeper curve
-	var growth := base_cost * 0.2                          # Cost grows ~20% of base per step
-	return int(current_cost + growth * pow(level + 1, exponent) / difficulty_scale)
-
-func get_upgrade_cost_v3(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
-	# Base growth: % of starting cost
-	var growth := base_cost * 0.2
-	
-	# Exponent: ensures lower max-level upgrades grow faster
-	var exponent := 1.5 + (6.0 / max_level)  # Always >1.0
-	
-	# Optional: scale down slightly for high max-level upgrades
-	var scale := 1.0 + (max_level / 25.0)   # scale >1 for high max-levels
-	
+func get_upgrade_cost(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
+	var growth := base_cost * Globals.UPGRADE_COST_GROWTH
+	var exponent := Globals.UPGRADE_EXPONENT + (6.0 / max_level)
+	var scale := 1.0 + (max_level / 25.0)
 	return int(current_cost + growth * pow(level + 1, exponent) / scale)
 
 func purchase_upgrade(upgrade_id: String) -> bool:
@@ -106,7 +100,7 @@ func purchase_upgrade(upgrade_id: String) -> bool:
 	if quanta >= upgrade.cost:
 		quanta -= upgrade.cost
 		upgrade.level = min(upgrade.level + 1, upgrade.max_level)
-		upgrade.cost = get_upgrade_cost_v3(upgrade.cost, upgrade.level, upgrade.max_level, upgrade.initial_cost)
+		upgrade.cost = get_upgrade_cost(upgrade.cost, upgrade.level, upgrade.max_level, upgrade.initial_cost)
 		upgrade.effect.call()
 		return true
 	return false
@@ -208,6 +202,8 @@ func reset_game() -> void:
 		Globals.STABILIZER_ID: {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
 		Globals.SHIFT_ID: {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
 	}
+	print("reset game")
+	print("cascade_progress: " + str(cascade_progress))
 	set_progress_bar_max_value(cascade_threshold)
 	
 	# Delete save file
@@ -234,7 +230,10 @@ func set_progress_bar_max_value(new_max_value: float):
 		# Change the max_value property
 		progress_bar.max_value = new_max_value
 		progress_bar.value = cascade_progress
-		#print(str(cascade_progress))
+		print()
+		print("Set PB")
+		print(str(progress_bar.value))
+		print(str(progress_bar.max_value))
 		#print("Updated CascadeProgress max_value to: ", new_max_value)
 	#else:
 		## This will help debug if the node is not found or is the wrong type

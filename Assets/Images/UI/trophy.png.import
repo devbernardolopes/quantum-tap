@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8xtrr6veudi5"
-path="res://.godot/imported/gear.png-c3f6d70c42a3603c8fa6687f6cb995f2.ctex"
+uid="uid://dwa10x82qcyls"
+path="res://.godot/imported/trophy.png-9209c99ca5c9cbfd0985d27ed47931f2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Images/Upgrades/gear.png"
-dest_files=["res://.godot/imported/gear.png-c3f6d70c42a3603c8fa6687f6cb995f2.ctex"]
+source_file="res://Assets/Images/UI/trophy.png"
+dest_files=["res://.godot/imported/trophy.png-9209c99ca5c9cbfd0985d27ed47931f2.ctex"]
 
 [params]
 

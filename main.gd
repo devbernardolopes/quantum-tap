@@ -16,6 +16,7 @@ extends Control
 
 @onready var circular_cascade_progress: ColorRect = $CircularCascadeProgress
 @onready var cascade_progress: ProgressBar = $ProgressContainer/ProgressDisplay/CascadeProgress
+@onready var quanta_goal_progress: ProgressBar = $ProgressContainer2/ProgressDisplay/QuantaGoalProgress
 
 @onready var upgrade1 = $UpgradesContainer/Upgrade1
 @onready var upgrade2 = $UpgradesContainer/Upgrade2
@@ -88,8 +89,10 @@ func _ready() -> void:
 	quanta_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_NORMAL)
 
 	cascade_progress.value_changed.connect(_on_cascade_progress_value_changed)
-	setup_cascade_progress_bar()
-	#setup_cascade_progress()
+	setup_progress_bar(cascade_progress)
+	
+	quanta_goal_progress.value_changed.connect(_on_quanta_goal_progress_value_changed)
+	setup_progress_bar(quanta_goal_progress)
 	
 	particle_effect.emitting = false
 	particle_effect_2.emitting = false
@@ -102,6 +105,8 @@ func _ready() -> void:
 
 	# Update initial UI
 	#reset_game()
+	quanta_goal_progress.value = 0
+	quanta_goal_progress.max_value = Globals.QUANTA_GOAL
 	update_ui()
 
 func load_banner_ad() -> void:
@@ -342,7 +347,7 @@ func create_animated_gradient_fill() -> StyleBoxFlat:
 
 	return fill
 
-func setup_cascade_progress_bar() -> void:
+func setup_progress_bar(progress_bar: ProgressBar) -> void:
 	var bg := StyleBoxFlat.new()
 	bg.bg_color = Color(0.15, 0.15, 0.2, 1.0)
 	bg.corner_radius_top_left = Globals.CORNER_RADIUS
@@ -365,11 +370,11 @@ func setup_cascade_progress_bar() -> void:
 	#fill.shadow_color = Color(0, 0, 0, 0.3)
 	#fill.shadow_size = 2
 
-	cascade_progress.add_theme_stylebox_override("background", bg)
-	cascade_progress.add_theme_stylebox_override("fill", fill)
+	progress_bar.add_theme_stylebox_override("background", bg)
+	progress_bar.add_theme_stylebox_override("fill", fill)
 
-	cascade_progress.add_theme_font_override("font", Globals.CASCADE_PROGRESS_FONT)
-	cascade_progress.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_SMALLER)
+	progress_bar.add_theme_font_override("font", Globals.CASCADE_PROGRESS_FONT)
+	progress_bar.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_SMALLER)
 	#var tw = create_tween()
 	#tw.tween_property(fill, "bg_color", Color(0.4, 0.8, 1.0), 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	#tw.set_loops()
@@ -451,6 +456,8 @@ func reset_game() -> void:
 		character_video.stop()
 		character_video.stream = null
 
+	cascade_progress.value = 0
+
 	Gm.reset_game()
 	update_ui()
 
@@ -485,12 +492,15 @@ func update_circular_cascade_progress(value: float) -> void:
 			_material.set_shader_parameter("progress", Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0))
 			_material.set_shader_parameter("ring_thickness", Gm.get_normalized_value(value, cascade_progress.max_value, Globals.CIRCULAR_CASCADE_PROGRESS_MINIMUM_RING_THICKNESS, Globals.CIRCULAR_CASCADE_PROGRESS_MAXIMUM_RING_THICKNESS))
 
+func _on_quanta_goal_progress_value_changed(value: float) -> void:
+	pass
+
 func _on_cascade_progress_value_changed(value: float) -> void:
 	if character_video:
 		if !character_video.is_playing():
 			if Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0) >= 0.1:
 				if !Gm.has_character_video_pre_cascade_played_this_cascade:
-					#print("Cascade 80%" + " " + str(value) + " " + str(cascade_progress.max_value))
+					print("Cascade" + str(cascade_progress.value) + " Value:" + str(value) + " MaxValue:" + str(cascade_progress.max_value))
 					
 					character_video.visible = true
 					character_video.stream = Globals.ALIX_PRE_CASCADE

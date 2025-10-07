@@ -30,6 +30,9 @@ const ALIX_QUANTUM_STABILIZER_INFO := preload("res://Assets/Videos/Characters/Al
 ## Dimensional shift detected. It will double our efforts.
 const ALIX_DIMENSIONAL_SHIFT_INFO := preload("res://Assets/Videos/Characters/Alix/dimensional-shift-info.ogv")
 
+## Our Entanglement Array is ready, it will provide us with random Quanta bursts.
+const ALIX_ENTANGLEMENT_ARRAY_INFO := preload("res://Assets/Videos/Characters/Alix/entanglement-array-info.ogv")
+
 #endregion
 
 const CORNER_RADIUS: int = 16
@@ -50,6 +53,8 @@ const QUANTUM_CORE_MAX_SCALE: Vector2 = Vector2(1.2, 1.2)
 const UPGRADE_TWEEN_DURATION: float = 0.15
 const UPGRADE_TWEEN_DELAY: float = 0.15
 
+const UPGRADE_EXPONENT: float = 1.5
+const UPGRADE_COST_GROWTH: float = 0.25
 const UPGRADE_MULTIPLIER: float = 1.5
 const UPGRADE_INCREMENT: float = 50.0
 const UPGRADE_BASE_LOG: float = 10.0
@@ -83,9 +88,9 @@ const SHIFT_COST: int = 500
 const SHIFT_LEVEL: int = 0
 const SHIFT_MAX_LEVEL: int = 6
 
-#const QUANTA_GOAL: int = 9223372036854775807
+const QUANTA_GOAL: int = 9223372036854775807
 #const QUANTA_GOAL: int = 1000
-const QUANTA_GOAL: int = 775807
+#const QUANTA_GOAL: int = 775807
 
 const CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED: float = 0.05 # radians per second
 const CIRCULAR_CASCADE_PROGRESS_MINIMUM_RING_THICKNESS: float = 0.01
