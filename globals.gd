@@ -4,11 +4,16 @@ const UI_FONT_SIZE_SMALLER: int = 12
 const UI_FONT_SIZE_SMALL: int = 14
 const UI_FONT_SIZE_NORMAL: int = 20
 const UI_FONT_SIZE_LARGE: int = 24
+const UI_FONT_SIZE_EXTRA_LARGE: int = 30
+const UI_FONT_SIZE_ULTRA_LARGE: int = 48
 
 const UPGRADE_NAME_FONT_SIZE: int = 12
 const UPGRADE_INFO_FONT_SIZE: int = 10
 
 const FONT_KENNEY_FUTURE := preload("res://Assets/Fonts/Kenney Future.ttf")
+const FONT_KENNEY_FUTURE_NARROW := preload("res://Assets/Fonts/Kenney Future Narrow.ttf")
+const FONT_XOLONIUM_REGULAR := preload("res://Assets/Fonts/Xolonium-Regular.ttf")
+const FONT_XOLONIUM_BOLD := preload("res://Assets/Fonts/Xolonium-Bold.ttf")
 
 const UI_FONT_LIGHT := preload("res://Assets/Fonts/ClearSans-Light.ttf")
 const UI_FONT_REGULAR := preload("res://Assets/Fonts/ClearSans-Regular.ttf")
@@ -20,6 +25,9 @@ const CASCADE_PROGRESS_FONT := FONT_KENNEY_FUTURE
 #region ALIX DIALOGUES
 ## We are close to a breakthrough. Accelerate production to trigger the cascade!
 const ALIX_PRE_CASCADE := preload("res://Assets/Videos/Characters/Alix/pre-cascade.ogv")
+
+## Cascade imminent! Keep generating Quanta!
+const ALIX_PRE_CASCADE_2 := preload("res://Assets/Videos/Characters/Alix/cascade-imminent.ogv")
 
 ## The Particle Accelerator will provide us with extra Quanta per action.
 const ALIX_PARTICLE_ACCELERATOR_INFO := preload("res://Assets/Videos/Characters/Alix/particle-acccelerator-info.ogv")
@@ -34,6 +42,9 @@ const ALIX_DIMENSIONAL_SHIFT_INFO := preload("res://Assets/Videos/Characters/Ali
 const ALIX_ENTANGLEMENT_ARRAY_INFO := preload("res://Assets/Videos/Characters/Alix/entanglement-array-info.ogv")
 
 #endregion
+
+const CASCADE_ALIX_THRESHOLD_MIN: float = 0.8
+const CASCADE_ALIX_THRESHOLD_MAX: float = 1.0
 
 const CORNER_RADIUS: int = 16
 const HORIZONTAL_CORNER_RADIUS: int = 8
@@ -87,6 +98,12 @@ const SHIFT_INITIAL_COST: int = 500
 const SHIFT_COST: int = 500
 const SHIFT_LEVEL: int = 0
 const SHIFT_MAX_LEVEL: int = 6
+
+const ENTANGLEMENT_ID: String = "entanglement"
+const ENTANGLEMENT_INITIAL_COST: int = 150
+const ENTANGLEMENT_COST: int = 150
+const ENTANGLEMENT_LEVEL: int = 0
+const ENTANGLEMENT_MAX_LEVEL: int = 15
 
 const QUANTA_GOAL: int = 9223372036854775807
 #const QUANTA_GOAL: int = 1000

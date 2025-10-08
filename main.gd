@@ -2,6 +2,7 @@ extends Control
 
 @onready var admob: Admob = $Admob
 
+@onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
 @onready var tap_sound: AudioStreamPlayer2D = $TapSound
 
 @onready var background: ColorRect = $Background
@@ -18,14 +19,22 @@ extends Control
 @onready var cascade_progress: ProgressBar = $ProgressContainer/ProgressDisplay/CascadeProgress
 @onready var quanta_goal_progress: ProgressBar = $ProgressContainer2/ProgressDisplay/QuantaGoalProgress
 
-@onready var upgrade1 = $UpgradesContainer/Upgrade1
-@onready var upgrade2 = $UpgradesContainer/Upgrade2
-@onready var upgrade3 = $UpgradesContainer/Upgrade3
+@onready var upgrade_scroll_container: ScrollContainer = $UpgradeScrollContainer
+@onready var upgrade1: Upgrade = $UpgradeScrollContainer/UpgradesContainer/Upgrade1
+@onready var upgrade2: Upgrade = $UpgradeScrollContainer/UpgradesContainer/Upgrade2
+@onready var upgrade3: Upgrade = $UpgradeScrollContainer/UpgradesContainer/Upgrade3
+@onready var upgrade4: Upgrade = $UpgradeScrollContainer/UpgradesContainer/Upgrade4
 
 @onready var new_game: TextureButton = $TopMenu/NewGame
+@onready var audio_on_off: TextureButton = $TopMenu/AudioOnOff
+@onready var music_on_off: TextureButton = $TopMenu/MusicOnOff
+@onready var stats_button: TextureButton = $TopMenu/StatsButton
 @onready var ad_boost: TextureButton = $TopMenu/AdBoost
 
 @onready var character_video: VideoStreamPlayer = $CharacterVideo
+
+var floating_label_scene := preload("res://floating_label.tscn")
+var floating_labels: Array[FloatingLabel] = []
 
 var circular_cascade_progress_rotation_speed: float = 0.0
 var circular_cascade_progress_ring_thickness: float = 0.01
@@ -34,6 +43,8 @@ var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
 
 func _ready() -> void:
+	#print("MAIN ready")
+
 	# Initialize AdMob plugin
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
 		admob.initialization_completed.connect(_on_admob_initialization_completed)
@@ -67,11 +78,14 @@ func _ready() -> void:
 	upgrade1.upgrade_id = "accelerator"
 	upgrade2.upgrade_id = "stabilizer"
 	upgrade3.upgrade_id = "shift"
+	upgrade4.upgrade_id = "entanglement"
 	
 	# Connect button signals
 	quantum_core.pressed.connect(_on_quantum_core_pressed)
 	
 	new_game.pressed.connect(_on_new_game_pressed)
+	audio_on_off.toggled.connect(_on_audio_on_off_toggled)
+	music_on_off.toggled.connect(_on_music_on_off_toggled)
 	ad_boost.pressed.connect(_on_ad_boost_pressed)
 	
 	character_video.finished.connect(_on_character_video_finished)
@@ -79,6 +93,7 @@ func _ready() -> void:
 	upgrade1.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("accelerator"))
 	upgrade2.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("stabilizer"))
 	upgrade3.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("shift"))
+	upgrade4.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("entanglement"))
 	
 	# Connect Gm signals
 	Gm.quanta_changed.connect(_on_quanta_changed)
@@ -104,9 +119,16 @@ func _ready() -> void:
 	update_circular_cascade_progress(0)
 
 	# Update initial UI
-	#reset_game()
 	quanta_goal_progress.value = 0
 	quanta_goal_progress.max_value = Globals.QUANTA_GOAL
+
+	audio_on_off.set_pressed_no_signal(!Gm.is_sound_on)
+	music_on_off.set_pressed_no_signal(!Gm.is_music_on)
+
+	audio_stream_player.play(Gm.music_last_position)
+
+	upgrade_scroll_container.get_h_scroll_bar().value = Gm.last_h_scrollbar_value
+
 	update_ui()
 
 func load_banner_ad() -> void:
@@ -217,10 +239,29 @@ func _process(_delta: float) -> void:
 					character_video.play()
 					Gm.has_character_video_dimensional_shift_info_played = true
 
+	if Gm.is_sound_on:
+		character_video.volume = 1.0
+	else:
+		character_video.volume = 0.0
+
+	if Gm.is_music_on:
+		audio_stream_player.volume_linear = 1.0
+	else:
+		audio_stream_player.volume_linear = 0.0
+
+	if audio_stream_player:
+		if audio_stream_player.playing:
+			Gm.music_last_position = audio_stream_player.get_playback_position()
+
+	if upgrade_scroll_container:
+		if upgrade_scroll_container.get_h_scroll_bar():
+			Gm.last_h_scrollbar_value = upgrade_scroll_container.get_h_scroll_bar().value
+
 	update_ui()
 
 func _on_quantum_core_pressed() -> void:
-	tap_sound.play()
+	if Gm.is_sound_on:
+		tap_sound.play()
 
 	Gm.add_quanta(Gm.quanta_per_tap)
 
@@ -263,6 +304,8 @@ func _on_upgrade_pressed(upgrade_id: String) -> void:
 			upgrade2.play_purchase_animation()
 		elif upgrade_id == "shift":
 			upgrade3.play_purchase_animation()
+		elif upgrade_id == "entanglement":
+			upgrade4.play_purchase_animation()
 		update_ui()
 
 func update_ui() -> void:
@@ -273,6 +316,7 @@ func update_ui() -> void:
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
 	cascade_progress.value = Gm.cascade_progress
+	quanta_goal_progress.value = Gm.quanta
 	
 	# Sync Upgrade properties with Gm.upgrades
 	upgrade1.cost = Gm.upgrades.accelerator.cost
@@ -281,9 +325,12 @@ func update_ui() -> void:
 	upgrade2.level = Gm.upgrades.stabilizer.level
 	upgrade3.cost = Gm.upgrades.shift.cost
 	upgrade3.level = Gm.upgrades.shift.level
+	upgrade4.cost = Gm.upgrades.entanglement.cost
+	upgrade4.level = Gm.upgrades.entanglement.level
 	upgrade1.update_ui()
 	upgrade2.update_ui()
 	upgrade3.update_ui()
+	upgrade4.update_ui()
 
 func create_gradient_fill() -> StyleBoxTexture:
 	var _size: Vector2i = cascade_progress.size # Vector2i(256, cascade_progress.size.y)  # base texture size; adjust to your bar height
@@ -311,41 +358,6 @@ func create_gradient_fill() -> StyleBoxTexture:
 	sb.modulate_color = Color.WHITE  # preserves gradient colors accurately
 
 	return sb
-
-func create_animated_gradient_fill() -> StyleBoxFlat:
-	var fill := StyleBoxFlat.new()
-	fill.corner_radius_top_left = Globals.CORNER_RADIUS
-	fill.corner_radius_top_right = Globals.CORNER_RADIUS
-	fill.corner_radius_bottom_left = Globals.CORNER_RADIUS
-	fill.corner_radius_bottom_right = Globals.CORNER_RADIUS
-	fill.set_border_width_all(1)
-	fill.border_color = Color(0.0, 0.22, 0.473)
-
-	# Create a shader that animates a moving gradient
-	var shader_code := """
-		shader_type canvas_item;
-
-		uniform float speed : hint_range(0.0, 5.0) = 0.3;
-		uniform vec3 color_start : source_color = vec3(0.3, 0.6, 1.0);
-		uniform vec3 color_end : source_color = vec3(0.0, 0.22, 0.473);
-		uniform float brightness = 1.0;
-
-		void fragment() {
-			float offset = mod(UV.x + TIME * speed, 1.0);
-			vec3 color = mix(color_start, color_end, offset);
-			COLOR = vec4(color * brightness, 1.0);
-		}
-	"""
-
-	var shader := Shader.new()
-	shader.code = shader_code
-
-	var shader_mat := ShaderMaterial.new()
-	shader_mat.shader = shader
-
-	fill.material = shader_mat
-
-	return fill
 
 func setup_progress_bar(progress_bar: ProgressBar) -> void:
 	var bg := StyleBoxFlat.new()
@@ -451,6 +463,8 @@ func _on_interstitial_ad_loading_timer_timeout() -> void:
 	pass
 
 func reset_game() -> void:
+	clear_all_labels()
+	
 	character_video.visible = false
 	if character_video.is_playing():
 		character_video.stop()
@@ -459,6 +473,14 @@ func reset_game() -> void:
 	cascade_progress.value = 0
 
 	Gm.reset_game()
+
+	Gm.last_quanta = Gm.quanta
+	audio_on_off.set_pressed_no_signal(!Gm.is_sound_on)
+	music_on_off.set_pressed_no_signal(!Gm.is_music_on)
+	
+	#upgrade_scroll_container.get_h_scroll_bar().set_value_no_signal(Gm.last_h_scrollbar_value)
+	upgrade_scroll_container.get_h_scroll_bar().value = Gm.last_h_scrollbar_value
+
 	update_ui()
 
 func _on_new_game_pressed() -> void:
@@ -483,7 +505,11 @@ func _on_ad_boost_pressed() -> void:
 
 func _on_quanta_changed(new_value: int) -> void:
 	circular_cascade_progress_rotation_speed = Gm.get_normalized_value(new_value, Globals.QUANTA_GOAL, Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED, 6.28)
-	#print(str(circular_cascade_progress_rotation_speed))
+
+	if new_value > Gm.last_quanta:
+		var gain := new_value - Gm.last_quanta
+		_show_quanta_gain(gain)
+	Gm.last_quanta = new_value
 
 func update_circular_cascade_progress(value: float) -> void:
 	if circular_cascade_progress.material:
@@ -498,7 +524,8 @@ func _on_quanta_goal_progress_value_changed(value: float) -> void:
 func _on_cascade_progress_value_changed(value: float) -> void:
 	if character_video:
 		if !character_video.is_playing():
-			if Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0) >= 0.1:
+			var cascade_progress_percentage: float = Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0)
+			if cascade_progress_percentage >= Globals.CASCADE_ALIX_THRESHOLD_MIN:
 				if !Gm.has_character_video_pre_cascade_played_this_cascade:
 					print("Cascade" + str(cascade_progress.value) + " Value:" + str(value) + " MaxValue:" + str(cascade_progress.max_value))
 					
@@ -511,3 +538,23 @@ func _on_cascade_progress_value_changed(value: float) -> void:
 
 func _on_character_video_finished() -> void:
 	character_video.visible = false
+
+func _show_quanta_gain(gain: int) -> void:
+	var label_instance: FloatingLabel = floating_label_scene.instantiate()
+	get_tree().current_scene.add_child(label_instance)
+	
+	var start_pos = quantum_core_2d.get_global_position()
+	label_instance.setup(str(gain), start_pos, gain)
+	floating_labels.append(label_instance)
+
+func clear_all_labels() -> void:
+	for label in floating_labels:
+		if is_instance_valid(label):
+			label.queue_free()
+	floating_labels.clear()
+
+func _on_audio_on_off_toggled(toggled_on: bool) -> void:
+	Gm.is_sound_on = !toggled_on
+
+func _on_music_on_off_toggled(toggled_on: bool) -> void:
+	Gm.is_music_on = !toggled_on

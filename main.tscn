@@ -1,8 +1,9 @@
-[gd_scene load_steps=106 format=3 uid="uid://cyq7iemom75wj"]
+[gd_scene load_steps=108 format=3 uid="uid://cyq7iemom75wj"]
 
 [ext_resource type="Script" uid="uid://bs6o0rxqsqxcg" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://b5oe5hgj2uymx" path="res://addons/AdmobPlugin/Admob.gd" id="2_0xm2m"]
 [ext_resource type="AudioStream" uid="uid://dsef6olbqb81e" path="res://Assets/Sounds/impactGlass_heavy_003.ogg" id="3_5vw27"]
+[ext_resource type="AudioStream" uid="uid://b6k2y5d5q2o18" path="res://Assets/Musics/cyberpunkmix4.ogg" id="3_inymm"]
 [ext_resource type="Shader" uid="uid://dn1i5dvuqxadu" path="res://Shaders/starfield.gdshader" id="4_53bls"]
 [ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
 [ext_resource type="Texture2D" uid="uid://cwi2hgecpmqe6" path="res://Assets/Images/UI/return.png" id="5_yjja3"]
@@ -100,6 +101,7 @@
 [ext_resource type="Texture2D" uid="uid://dlgeosn3otwh2" path="res://Assets/Images/QuantumCore/frame_0081.png" id="90_4qxq8"]
 [ext_resource type="FontFile" uid="uid://wgpvbfnuvc7k" path="res://Assets/Fonts/Xolonium-Regular.ttf" id="91_0abf2"]
 [ext_resource type="Texture2D" uid="uid://d0vurmhnyy0vv" path="res://Assets/Images/Textures/Spark.png" id="91_41lik"]
+[ext_resource type="Texture2D" uid="uid://bslaeqxxyjxpt" path="res://Assets/Images/Upgrades/entanglement-array.png" id="101_l0gw7"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lwnsi"]
 shader = ExtResource("4_53bls")
@@ -407,6 +409,10 @@ debug_rewarded_id = "ca-app-pub-3940256099942544/5224354917"
 debug_rewarded_interstitial_id = "ca-app-pub-3940256099942544/5354046379"
 metadata/_custom_type_script = "uid://b5oe5hgj2uymx"
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_inymm")
+parameters/looping = true
+
 [node name="TapSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("3_5vw27")
 
@@ -627,22 +633,28 @@ mouse_filter = 2
 expand = true
 metadata/_edit_lock_ = true
 
-[node name="UpgradesContainer" type="GridContainer" parent="."]
+[node name="UpgradeScrollContainer" type="ScrollContainer" parent="."]
+clip_contents = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
 anchor_top = 0.1
 anchor_right = 0.9
-anchor_bottom = 0.3
-offset_left = -7.5
-offset_right = 7.5
+anchor_bottom = 0.1
+offset_bottom = 149.0
 grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/h_separation = 0
-theme_override_constants/v_separation = 0
-columns = 3
+follow_focus = true
+draw_focus_border = true
+vertical_scroll_mode = 0
 
-[node name="Upgrade1" parent="UpgradesContainer" instance=ExtResource("7_272bh")]
+[node name="UpgradesContainer" type="GridContainer" parent="UpgradeScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+mouse_filter = 2
+theme_override_constants/h_separation = 16
+columns = 4
+
+[node name="Upgrade1" parent="UpgradeScrollContainer/UpgradesContainer" instance=ExtResource("7_272bh")]
 layout_mode = 2
 upgrade_id = "accelerator"
 upgrade_name = "Particle Accelerator"
@@ -652,7 +664,7 @@ cost = 50
 max_level = 25
 texture = ExtResource("7_kek77")
 
-[node name="Upgrade2" parent="UpgradesContainer" instance=ExtResource("7_272bh")]
+[node name="Upgrade2" parent="UpgradeScrollContainer/UpgradesContainer" instance=ExtResource("7_272bh")]
 layout_mode = 2
 upgrade_id = "stabilizer"
 upgrade_name = "Quantum Stabilizer"
@@ -662,7 +674,7 @@ cost = 200
 max_level = 15
 texture = ExtResource("8_kek77")
 
-[node name="Upgrade3" parent="UpgradesContainer" instance=ExtResource("7_272bh")]
+[node name="Upgrade3" parent="UpgradeScrollContainer/UpgradesContainer" instance=ExtResource("7_272bh")]
 layout_mode = 2
 upgrade_id = "shift"
 upgrade_name = "Dimensional Shift"
@@ -671,3 +683,13 @@ initial_cost = 500
 cost = 500
 max_level = 6
 texture = ExtResource("9_4c57u")
+
+[node name="Upgrade4" parent="UpgradeScrollContainer/UpgradesContainer" instance=ExtResource("7_272bh")]
+layout_mode = 2
+upgrade_id = "entanglement"
+upgrade_name = "Entanglement Array"
+description = "Random Quanta/tap"
+initial_cost = 150
+cost = 150
+max_level = 15
+texture = ExtResource("101_l0gw7")

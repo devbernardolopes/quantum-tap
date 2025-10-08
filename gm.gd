@@ -1,8 +1,9 @@
 extends Node
 
+var last_quanta: int = 0
+
 var _quanta_internal: int = 0
 
-## 9223372036854775807 Biggest value an int can store
 var quanta: int:
 	get:
 		return _quanta_internal
@@ -11,6 +12,13 @@ var quanta: int:
 			return
 		_quanta_internal = value
 		emit_signal("quanta_changed", value)
+
+var is_sound_on: bool = true
+var is_music_on: bool = true
+
+var music_last_position: float = 0.0
+
+var last_h_scrollbar_value: float = 0.0
 
 var quanta_per_tap: int = 1
 var quanta_per_second: int = 0
@@ -31,13 +39,15 @@ var play_character_video_dimensional_shift_info: bool = false
 var upgrades: Dictionary = {
 	Globals.ACCELERATOR_ID: {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
 	Globals.STABILIZER_ID: {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
-	Globals.SHIFT_ID: {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
+	Globals.SHIFT_ID: {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2},
+	Globals.ENTANGLEMENT_ID: {"initial_cost": Globals.ENTANGLEMENT_INITIAL_COST, "cost": Globals.ENTANGLEMENT_COST, "level": Globals.ENTANGLEMENT_LEVEL, "max_level": Globals.ENTANGLEMENT_MAX_LEVEL, "effect": func(): pass}
 }
 
 signal game_state_updated
 signal quanta_changed(new_value: int)
 
 func _ready() -> void:
+	#print("GM ready")
 	load_game()
 
 func _process(delta: float) -> void:
@@ -56,38 +66,13 @@ func _notification(what: int) -> void:
 
 func add_quanta(amount: int) -> void:
 	quanta += int(amount * multiplier)
-	#quanta += int(amount)
+	if upgrades.has("entanglement") and upgrades.entanglement.level > 0:
+			var chance = clamp(0.05 + upgrades.entanglement.level * 0.02, 0.0, 1.0)
+			if randf() < chance:
+				quanta += 10
 	cascade_progress += amount
 	if cascade_progress >= cascade_threshold:
 		trigger_cascade()
-
-#func get_upgrade_cost(initial_cost: int, cost: int, level: int, formula: Globals.UPGRADE_PROGRESSION_FORMULA = Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL) -> int:
-	#var result: int = 0
-	#
-	#match formula:
-		#Globals.UPGRADE_PROGRESSION_FORMULA.QUADRATIC:
-			#return int(initial_cost + Globals.UPGRADE_INCREMENT * pow(level, 2))
-#
-		#Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL:
-			#return int(cost * Globals.UPGRADE_MULTIPLIER)
-#
-		#Globals.UPGRADE_PROGRESSION_FORMULA.EXPONENTIAL_VAR_BASE:
-			#return int(cost * (1.2 + (0.1 * level)))
-#
-		#Globals.UPGRADE_PROGRESSION_FORMULA.LOGARITHMIC:
-			#return int(initial_cost * (1.0 + 1.5 * (log(Globals.UPGRADE_BASE_LOG + level) / log(Globals.UPGRADE_BASE_LOG))))
-			##return int(initial_cost * log(Globals.UPGRADE_BASE_LOG + level))
-#
-		#Globals.UPGRADE_PROGRESSION_FORMULA.FIBONACCI_LIKE:
-			#pass
-#
-	#return result
-#
-#func get_upgrade_cost_v2(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
-	#var difficulty_scale := 1.0 + (float(max_level) / 10.0) # Higher max_level = softer curve
-	#var exponent := 1.5 + (6.0 - float(max_level)) * 0.1   # Lower max_level = steeper curve
-	#var growth := base_cost * 0.2                          # Cost grows ~20% of base per step
-	#return int(current_cost + growth * pow(level + 1, exponent) / difficulty_scale)
 
 func get_upgrade_cost(current_cost: float, level: int, max_level: int, base_cost: float) -> int:
 	var growth := base_cost * Globals.UPGRADE_COST_GROWTH
@@ -116,6 +101,10 @@ func trigger_cascade() -> void:
 
 func save_game() -> void:
 	var config = ConfigFile.new()
+	config.set_value("game" , "is_sound_on", is_sound_on)
+	config.set_value("game" , "is_music_on", is_music_on)
+	config.set_value("game" , "music_last_position", music_last_position)
+	config.set_value("game" , "last_h_scrollbar_value", last_h_scrollbar_value)
 	config.set_value("game" , "quanta", quanta)
 	config.set_value("game", "quanta_per_tap", quanta_per_tap)
 	config.set_value("game", "quanta_per_second", quanta_per_second)
@@ -148,6 +137,10 @@ func load_game() -> void:
 	if error != OK:
 		return  # No save file; use defaults
 	
+	is_sound_on = config.get_value("game", "is_sound_on", true)
+	is_music_on = config.get_value("game", "is_music_on", true)
+	music_last_position = config.get_value("game", "music_last_position", 0.0)
+	last_h_scrollbar_value = config.get_value("game", "last_h_scrollbar_value", 0.0)
 	quanta = config.get_value("game", "quanta", 0)
 	quanta_per_tap = config.get_value("game", "quanta_per_tap", 1)
 	quanta_per_second = config.get_value("game", "quanta_per_second", 0)
@@ -175,6 +168,8 @@ func load_game() -> void:
 	quanta_per_second = 0 + upgrades.stabilizer.level
 	multiplier = pow(2, upgrades.shift.level)
 	
+	last_quanta = quanta
+	
 	set_progress_bar_max_value(cascade_threshold)
 	
 	emit_signal("game_state_updated")
@@ -190,6 +185,8 @@ func reset_game() -> void:
 	has_character_video_dimensional_shift_info_played = false
 	play_character_video_dimensional_shift_info = false
 
+	music_last_position = 0.0
+	last_h_scrollbar_value = 0.0
 	quanta = 0
 	quanta_per_tap = 1
 	quanta_per_second = 0
@@ -200,12 +197,11 @@ func reset_game() -> void:
 	upgrades = {
 		Globals.ACCELERATOR_ID: {"initial_cost": Globals.ACCELERATOR_INITIAL_COST, "cost": Globals.ACCELERATOR_COST, "level": Globals.ACCELERATOR_LEVEL, "max_level": Globals.ACCELERATOR_MAX_LEVEL, "effect": func(): quanta_per_tap += 1},
 		Globals.STABILIZER_ID: {"initial_cost": Globals.STABILIZER_INITIAL_COST, "cost": Globals.STABILIZER_COST, "level": Globals.STABILIZER_LEVEL, "max_level": Globals.STABILIZER_MAX_LEVEL, "effect": func(): quanta_per_second += 1},
-		Globals.SHIFT_ID: {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2}
+		Globals.SHIFT_ID: {"initial_cost": Globals.SHIFT_INITIAL_COST, "cost": Globals.SHIFT_COST, "level": Globals.SHIFT_LEVEL, "max_level": Globals.SHIFT_MAX_LEVEL, "effect": func(): multiplier *= 2},
+		Globals.ENTANGLEMENT_ID: {"initial_cost": Globals.ENTANGLEMENT_INITIAL_COST, "cost": Globals.ENTANGLEMENT_COST, "level": Globals.ENTANGLEMENT_LEVEL, "max_level": Globals.ENTANGLEMENT_MAX_LEVEL, "effect": func(): pass}
 	}
-	print("reset game")
-	print("cascade_progress: " + str(cascade_progress))
 	set_progress_bar_max_value(cascade_threshold)
-	
+	last_quanta = quanta
 	# Delete save file
 	var dir = DirAccess.open("user://")
 	if dir.file_exists("savegame.cfg"):
@@ -230,14 +226,6 @@ func set_progress_bar_max_value(new_max_value: float):
 		# Change the max_value property
 		progress_bar.max_value = new_max_value
 		progress_bar.value = cascade_progress
-		print()
-		print("Set PB")
-		print(str(progress_bar.value))
-		print(str(progress_bar.max_value))
-		#print("Updated CascadeProgress max_value to: ", new_max_value)
-	#else:
-		## This will help debug if the node is not found or is the wrong type
-		#print("Error: Could not find ProgressBar node named 'CascadeProgress'.")
 
 func format_number(value: int, delimiter: String) -> String:
 	var str_val := str(abs(value))

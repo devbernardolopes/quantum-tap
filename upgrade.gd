@@ -42,7 +42,7 @@ extends VBoxContainer
 
 func _ready() -> void:
 	if name_label:
-		name_label.add_theme_font_override("font", Globals.UI_FONT_REGULAR)
+		name_label.add_theme_font_override("font", Globals.FONT_XOLONIUM_REGULAR)
 		name_label.add_theme_font_size_override("font_size", Globals.UPGRADE_NAME_FONT_SIZE)
 
 	if info_label:
@@ -92,7 +92,8 @@ func update_ui() -> void:
 
 func play_purchase_animation() -> void:
 	if icon_button:
-		purchase_sound.play()
+		if Gm.is_sound_on:
+			purchase_sound.play()
 		var tween = create_tween().set_parallel(true)
 		# Scale pulse: grow to 1.15x and back
 		tween.tween_property(icon_button, "scale", Vector2(1.15, 1.15), Globals.UPGRADE_TWEEN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
