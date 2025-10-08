@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://qnccua2esqqc"]
+
+[ext_resource type="Script" uid="uid://nvn78jfwnkut" path="res://beat_sync.gd" id="1_eya82"]
+
+[node name="BeatSync" type="Node"]
+script = ExtResource("1_eya82")

@@ -1,10 +1,11 @@
-[gd_scene load_steps=108 format=3 uid="uid://cyq7iemom75wj"]
+[gd_scene load_steps=109 format=3 uid="uid://cyq7iemom75wj"]
 
 [ext_resource type="Script" uid="uid://bs6o0rxqsqxcg" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://b5oe5hgj2uymx" path="res://addons/AdmobPlugin/Admob.gd" id="2_0xm2m"]
 [ext_resource type="AudioStream" uid="uid://dsef6olbqb81e" path="res://Assets/Sounds/impactGlass_heavy_003.ogg" id="3_5vw27"]
-[ext_resource type="AudioStream" uid="uid://b6k2y5d5q2o18" path="res://Assets/Musics/cyberpunkmix4.ogg" id="3_inymm"]
+[ext_resource type="AudioStream" uid="uid://boh5pg77kbihf" path="res://Assets/Musics/cyberpunk_arcade_3.mp3" id="4_0arob"]
 [ext_resource type="Shader" uid="uid://dn1i5dvuqxadu" path="res://Shaders/starfield.gdshader" id="4_53bls"]
+[ext_resource type="Script" uid="uid://nvn78jfwnkut" path="res://beat_sync.gd" id="4_jcxqu"]
 [ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
 [ext_resource type="Texture2D" uid="uid://cwi2hgecpmqe6" path="res://Assets/Images/UI/return.png" id="5_yjja3"]
 [ext_resource type="Texture2D" uid="uid://b6y4smaqqdo1p" path="res://Assets/Images/UI/audioOn.png" id="6_l0gw7"]
@@ -398,6 +399,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_ig7tw")
+target_nodes = Array[NodePath]([NodePath("CircularCascadeProgress")])
 
 [node name="Admob" type="Node" parent="."]
 script = ExtResource("2_0xm2m")
@@ -409,8 +411,14 @@ debug_rewarded_id = "ca-app-pub-3940256099942544/5224354917"
 debug_rewarded_interstitial_id = "ca-app-pub-3940256099942544/5354046379"
 metadata/_custom_type_script = "uid://b5oe5hgj2uymx"
 
+[node name="BeatSync" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("4_jcxqu")
+audio_stream_player = NodePath("../AudioStreamPlayer")
+metadata/_custom_type_script = "uid://nvn78jfwnkut"
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_inymm")
+stream = ExtResource("4_0arob")
+bus = &"Music"
 parameters/looping = true
 
 [node name="TapSound" type="AudioStreamPlayer2D" parent="."]
@@ -525,6 +533,7 @@ offset_right = 180.0
 offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
+pivot_offset = Vector2(180, 180)
 mouse_filter = 2
 
 [node name="ParticleEffect" type="CPUParticles2D" parent="."]

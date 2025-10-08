@@ -3,6 +3,10 @@ extends Control
 @onready var admob: Admob = $Admob
 
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
+@onready var beat_sync: BeatSync = $BeatSync
+
+@onready var spectrum: AudioEffectSpectrumAnalyzerInstance = AudioServer.get_bus_effect_instance(AudioServer.get_bus_index("Music"), 0) as AudioEffectSpectrumAnalyzerInstance
+
 @onready var tap_sound: AudioStreamPlayer2D = $TapSound
 
 @onready var background: ColorRect = $Background
@@ -17,6 +21,8 @@ extends Control
 
 @onready var circular_cascade_progress: ColorRect = $CircularCascadeProgress
 @onready var cascade_progress: ProgressBar = $ProgressContainer/ProgressDisplay/CascadeProgress
+
+@onready var progress_container_2: VBoxContainer = $ProgressContainer2
 @onready var quanta_goal_progress: ProgressBar = $ProgressContainer2/ProgressDisplay/QuantaGoalProgress
 
 @onready var upgrade_scroll_container: ScrollContainer = $UpgradeScrollContainer
@@ -41,6 +47,10 @@ var circular_cascade_progress_ring_thickness: float = 0.01
 
 var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
+
+@export var target_nodes: Array[NodePath]
+@export var pulse_strength := 1.1
+@export var pulse_speed := 6.0
 
 func _ready() -> void:
 	#print("MAIN ready")
@@ -81,6 +91,8 @@ func _ready() -> void:
 	upgrade4.upgrade_id = "entanglement"
 	
 	# Connect button signals
+	beat_sync.beat.connect(pulse)
+	
 	quantum_core.pressed.connect(_on_quantum_core_pressed)
 	
 	new_game.pressed.connect(_on_new_game_pressed)
@@ -108,7 +120,8 @@ func _ready() -> void:
 	
 	quanta_goal_progress.value_changed.connect(_on_quanta_goal_progress_value_changed)
 	setup_progress_bar(quanta_goal_progress)
-	
+
+	# Update initial UI
 	particle_effect.emitting = false
 	particle_effect_2.emitting = false
 	quantum_core.grab_focus()
@@ -116,9 +129,8 @@ func _ready() -> void:
 	character_video.visible = false
 	cascade_progress.value = 0
 
-	update_circular_cascade_progress(0)
+	update_circular_cascade_progress(0.0)
 
-	# Update initial UI
 	quanta_goal_progress.value = 0
 	quanta_goal_progress.max_value = Globals.QUANTA_GOAL
 
@@ -188,18 +200,6 @@ func show_rewarded_interstitial_ad() -> void:
 				admob.show_rewarded_interstitial_ad()
 
 func _process(_delta: float) -> void:
-	if circular_cascade_progress.material:
-		var _material: ShaderMaterial = circular_cascade_progress.material
-		if _material:
-			var rotation_offset: float = _material.get_shader_parameter("rotation_offset")
-			rotation_offset += circular_cascade_progress_rotation_speed * _delta
-
-			if rotation_offset >= TAU:
-				rotation_offset -= TAU
-
-			_material.set_shader_parameter("rotation_offset", rotation_offset)
-			#_material.set_shader_parameter("ring_thickness", rotation_offset)
-
 	if upgrade1.is_enabled():
 		if !Gm.has_character_video_particle_accelerator_info_played:
 			Gm.play_character_video_particle_accelerator_info = true
@@ -246,6 +246,12 @@ func _process(_delta: float) -> void:
 
 	if Gm.is_music_on:
 		audio_stream_player.volume_linear = 1.0
+		
+		if character_video:
+			if character_video.is_playing():
+				audio_stream_player.volume_linear = 0.35
+			else:
+				audio_stream_player.volume_linear = 1.0
 	else:
 		audio_stream_player.volume_linear = 0.0
 
@@ -256,6 +262,28 @@ func _process(_delta: float) -> void:
 	if upgrade_scroll_container:
 		if upgrade_scroll_container.get_h_scroll_bar():
 			Gm.last_h_scrollbar_value = upgrade_scroll_container.get_h_scroll_bar().value
+
+	if circular_cascade_progress.material:
+		var _material: ShaderMaterial = circular_cascade_progress.material
+		if _material:
+			var rotation_offset: float = _material.get_shader_parameter("rotation_offset")
+			rotation_offset += circular_cascade_progress_rotation_speed * _delta
+
+			if rotation_offset >= TAU:
+				rotation_offset -= TAU
+
+			_material.set_shader_parameter("rotation_offset", rotation_offset)
+			
+			#var total_energy: float = get_live_frequency_data(_delta)
+			#circular_cascade_progress.scale = Vector2.ONE * (1.0 + total_energy * 3.0)
+			#print(str((total_energy * 3.0)))
+
+			#_material.set_shader_parameter("ring_thickness", rotation_offset)
+
+	for p in target_nodes:
+		var node = get_node(p)
+		node.scale = node.scale.lerp(Vector2.ONE, _delta * pulse_speed)
+		node.modulate = node.modulate.lerp(Color.WHITE, _delta * pulse_speed)
 
 	update_ui()
 
@@ -475,11 +503,15 @@ func reset_game() -> void:
 	Gm.reset_game()
 
 	Gm.last_quanta = Gm.quanta
+
 	audio_on_off.set_pressed_no_signal(!Gm.is_sound_on)
 	music_on_off.set_pressed_no_signal(!Gm.is_music_on)
+	audio_stream_player.play()
 	
 	#upgrade_scroll_container.get_h_scroll_bar().set_value_no_signal(Gm.last_h_scrollbar_value)
 	upgrade_scroll_container.get_h_scroll_bar().value = Gm.last_h_scrollbar_value
+
+	beat_sync.reset()
 
 	update_ui()
 
@@ -518,7 +550,9 @@ func update_circular_cascade_progress(value: float) -> void:
 			_material.set_shader_parameter("progress", Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0))
 			_material.set_shader_parameter("ring_thickness", Gm.get_normalized_value(value, cascade_progress.max_value, Globals.CIRCULAR_CASCADE_PROGRESS_MINIMUM_RING_THICKNESS, Globals.CIRCULAR_CASCADE_PROGRESS_MAXIMUM_RING_THICKNESS))
 
+@warning_ignore("unused_parameter")
 func _on_quanta_goal_progress_value_changed(value: float) -> void:
+	#print(str(value))
 	pass
 
 func _on_cascade_progress_value_changed(value: float) -> void:
@@ -558,3 +592,24 @@ func _on_audio_on_off_toggled(toggled_on: bool) -> void:
 
 func _on_music_on_off_toggled(toggled_on: bool) -> void:
 	Gm.is_music_on = !toggled_on
+
+func get_live_frequency_data(_delta: float) -> float:
+	var low = spectrum.get_magnitude_for_frequency_range(20, 250)  # Bass
+	var mid = spectrum.get_magnitude_for_frequency_range(250, 2000)
+	var high = spectrum.get_magnitude_for_frequency_range(2000, 8000)
+	
+	var total_energy = (low.length() + mid.length() + high.length()) / 3.0
+
+	var smooth_energy: float = 0.0
+	smooth_energy = lerp(smooth_energy, total_energy, 0.1)
+
+	# For example, scale a UI element (like a Panel or TextureRect)
+	#$YourUIElement.scale = Vector2.ONE * (1.0 + total_energy * 3.0)
+
+	return smooth_energy
+
+func pulse():
+	for p in target_nodes:
+		var node = get_node(p)
+		node.scale = Vector2.ONE * pulse_strength
+		node.modulate = Color(1.2, 1.0, 1.0) # optional brief tint
