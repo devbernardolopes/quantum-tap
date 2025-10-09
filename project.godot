@@ -36,7 +36,8 @@ enabled=PackedStringArray("res://addons/AdmobPlugin/plugin.cfg")
 
 folder_colors={
 "res://Assets/": "yellow",
-"res://Shaders/": "pink"
+"res://Shaders/": "pink",
+"res://Themes/": "teal"
 }
 
 [input]

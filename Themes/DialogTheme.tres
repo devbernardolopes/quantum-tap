@@ -1,0 +1,7 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://c6gvdvf78c64b"]
+
+[ext_resource type="FontFile" uid="uid://byoum0qdkinoe" path="res://Assets/Fonts/Kenney Future.ttf" id="1_h0cvq"]
+
+[resource]
+default_font = ExtResource("1_h0cvq")
+Button/font_sizes/font_size = 24

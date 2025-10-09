@@ -14,37 +14,38 @@ const FONT_KENNEY_FUTURE := preload("res://Assets/Fonts/Kenney Future.ttf")
 const FONT_KENNEY_FUTURE_NARROW := preload("res://Assets/Fonts/Kenney Future Narrow.ttf")
 const FONT_XOLONIUM_REGULAR := preload("res://Assets/Fonts/Xolonium-Regular.ttf")
 const FONT_XOLONIUM_BOLD := preload("res://Assets/Fonts/Xolonium-Bold.ttf")
-
-const UI_FONT_LIGHT := preload("res://Assets/Fonts/ClearSans-Light.ttf")
-const UI_FONT_REGULAR := preload("res://Assets/Fonts/ClearSans-Regular.ttf")
-const UI_FONT_BOLD := preload("res://Assets/Fonts/ClearSans-Bold.ttf")
+const FONT_CLEARSANS_LIGHT := preload("res://Assets/Fonts/ClearSans-Light.ttf")
+const FONT_CLEARSANS_REGULAR := preload("res://Assets/Fonts/ClearSans-Regular.ttf")
+const FONT_CLEARSANS_BOLD := preload("res://Assets/Fonts/ClearSans-Bold.ttf")
+const FONT_BPMONO := preload("res://Assets/Fonts/BPmono.ttf")
+const FONT_BPMONO_BOLD := preload("res://Assets/Fonts/BPmonoBold.ttf")
 
 const QUANTA_LABEL_FONT := FONT_KENNEY_FUTURE
 const CASCADE_PROGRESS_FONT := FONT_KENNEY_FUTURE
 
 #region ALIX DIALOGUES
 ## We are close to a breakthrough. Accelerate production to trigger the cascade!
-const ALIX_PRE_CASCADE := preload("res://Assets/Videos/Characters/Alix/pre-cascade.ogv")
+const ALIX_PRE_CASCADE: VideoStreamTheora = preload("res://Assets/Videos/Characters/Alix/pre-cascade.ogv")
 
 ## Cascade imminent! Keep generating Quanta!
-const ALIX_PRE_CASCADE_2 := preload("res://Assets/Videos/Characters/Alix/cascade-imminent.ogv")
+const ALIX_PRE_CASCADE_2: VideoStreamTheora = preload("res://Assets/Videos/Characters/Alix/cascade-imminent.ogv")
 
 ## The Particle Accelerator will provide us with extra Quanta per action.
-const ALIX_PARTICLE_ACCELERATOR_INFO := preload("res://Assets/Videos/Characters/Alix/particle-acccelerator-info.ogv")
+const ALIX_PARTICLE_ACCELERATOR_INFO: VideoStreamTheora = preload("res://Assets/Videos/Characters/Alix/particle-acccelerator-info.ogv")
 
 ## We must rely on the Quantum Stabilizer for passive Quanta generation.
-const ALIX_QUANTUM_STABILIZER_INFO := preload("res://Assets/Videos/Characters/Alix/quantum-stabilizer-info.ogv")
+const ALIX_QUANTUM_STABILIZER_INFO: VideoStreamTheora = preload("res://Assets/Videos/Characters/Alix/quantum-stabilizer-info.ogv")
 
 ## Dimensional shift detected. It will double our efforts.
-const ALIX_DIMENSIONAL_SHIFT_INFO := preload("res://Assets/Videos/Characters/Alix/dimensional-shift-info.ogv")
+const ALIX_DIMENSIONAL_SHIFT_INFO: VideoStreamTheora = preload("res://Assets/Videos/Characters/Alix/dimensional-shift-info.ogv")
 
 ## Our Entanglement Array is ready, it will provide us with random Quanta bursts.
-const ALIX_ENTANGLEMENT_ARRAY_INFO := preload("res://Assets/Videos/Characters/Alix/entanglement-array-info.ogv")
+const ALIX_ENTANGLEMENT_ARRAY_INFO: VideoStreamTheora = preload("res://Assets/Videos/Characters/Alix/entanglement-array-info.ogv")
 
 #endregion
 
-const CASCADE_ALIX_THRESHOLD_MIN: float = 0.8
-const CASCADE_ALIX_THRESHOLD_MAX: float = 1.0
+const CASCADE_ALIX_THRESHOLD_MIN: float = 0.75
+const CASCADE_ALIX_THRESHOLD_MAX: float = 0.8
 
 const CORNER_RADIUS: int = 16
 const HORIZONTAL_CORNER_RADIUS: int = 8
@@ -52,7 +53,7 @@ const VERTICAL_CORNER_RADIUS: int = 8
 
 const MIN_CASCADE_THRESHOLD: float = 100.0
 const MAX_CASCADE_THRESHOLD: float = 100000.0
-const CASCADE_THRESHOLD_MULTIPLIER: int = 2
+#const CASCADE_THRESHOLD_MULTIPLIER: int = 2
 
 const QUANTA_LABEL_TEXT: String = "QUANTA"
 
@@ -82,10 +83,10 @@ enum UPGRADE_PROGRESSION_FORMULA {
 }
 
 const ACCELERATOR_ID: String = "accelerator"
-const ACCELERATOR_INITIAL_COST: int = 50
-const ACCELERATOR_COST: int = 50
+const ACCELERATOR_INITIAL_COST: int = 25
+const ACCELERATOR_COST: int = 25
 const ACCELERATOR_LEVEL: int = 0
-const ACCELERATOR_MAX_LEVEL: int = 25
+const ACCELERATOR_MAX_LEVEL: int = 50
 
 const STABILIZER_ID: String = "stabilizer"
 const STABILIZER_INITIAL_COST: int = 200
@@ -105,9 +106,11 @@ const ENTANGLEMENT_COST: int = 150
 const ENTANGLEMENT_LEVEL: int = 0
 const ENTANGLEMENT_MAX_LEVEL: int = 15
 
+const QUANTA_LEVELS: int = 22
 const QUANTA_GOAL: int = QUANTA_GOAL_EASY
-const QUANTA_GOAL_EASY: int = 100000
-const QUANTA_GOAL_NORMAL: int = 775807
+const QUANTA_GOAL_EASY: int = 775807
+const QUANTA_GOAL_NORMAL: int = 775807 * 2
+const QUANTA_GOAL_MEDIUM: int = 775807 * 2
 const QUANTA_GOAL_HARD: int = 9223372036854775807
 
 const CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED: float = 0.05 # radians per second
@@ -115,3 +118,7 @@ const CIRCULAR_CASCADE_PROGRESS_MINIMUM_RING_THICKNESS: float = 0.01
 const CIRCULAR_CASCADE_PROGRESS_MAXIMUM_RING_THICKNESS: float = 0.07
 
 const CIRCULAR_CASCADE_PROGRESS_START_COLOR: Color = Color.ALICE_BLUE
+
+const PULSE_STRENGTH: float = 1.25
+const PULSE_SPEED: float = 4.0
+const PULSE_TINT_COLOR: Color = Color(1.2, 1.0, 1.0)

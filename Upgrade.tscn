@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://vmag8ie6o6eb" path="res://upgrade.gd" id="1_g2cgu"]
 [ext_resource type="AudioStream" uid="uid://chy1l4psu6nm0" path="res://Assets/Sounds/impactBell_heavy_000.ogg" id="2_6w8xc"]
-[ext_resource type="FontFile" uid="uid://7iuc2vwyu776" path="res://Assets/Fonts/ClearSans-Regular.ttf" id="3_a4xni"]
+[ext_resource type="FontFile" uid="uid://wgpvbfnuvc7k" path="res://Assets/Fonts/Xolonium-Regular.ttf" id="3_a4xni"]
 [ext_resource type="FontFile" uid="uid://dkv8lgccwfjc4" path="res://Assets/Fonts/ClearSans-Light.ttf" id="4_a0bff"]
 
 [node name="Upgrade" type="VBoxContainer"]

@@ -46,7 +46,7 @@ func _ready() -> void:
 		name_label.add_theme_font_size_override("font_size", Globals.UPGRADE_NAME_FONT_SIZE)
 
 	if info_label:
-		info_label.add_theme_font_override("font", Globals.UI_FONT_LIGHT)
+		info_label.add_theme_font_override("font", Globals.FONT_BPMONO)
 		info_label.add_theme_font_size_override("font_size", Globals.UPGRADE_INFO_FONT_SIZE)
 
 	update_ui()

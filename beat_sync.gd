@@ -31,11 +31,13 @@ func _process(_delta):
 			if audio_stream_player.playing:
 				if beat_index >= beats.size():
 					beat_index = 0
-					print("return")
+					#print("return")
 					#return
 
 				var pos = audio_stream_player.get_playback_position()
 				if pos >= beats[beat_index]:
 					emit_signal("beat")
-					print(str(pos) + " " + str(beats[beat_index]))
+					#print(str(pos) + " " + str(beats[beat_index]))
 					beat_index += 1
+
+		Gm.last_beat_index = beat_index

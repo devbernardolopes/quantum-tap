@@ -1,4 +1,4 @@
-[gd_scene load_steps=109 format=3 uid="uid://cyq7iemom75wj"]
+[gd_scene load_steps=110 format=3 uid="uid://cyq7iemom75wj"]
 
 [ext_resource type="Script" uid="uid://bs6o0rxqsqxcg" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://b5oe5hgj2uymx" path="res://addons/AdmobPlugin/Admob.gd" id="2_0xm2m"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://nvn78jfwnkut" path="res://beat_sync.gd" id="4_jcxqu"]
 [ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
 [ext_resource type="Texture2D" uid="uid://cwi2hgecpmqe6" path="res://Assets/Images/UI/return.png" id="5_yjja3"]
+[ext_resource type="Theme" uid="uid://c6gvdvf78c64b" path="res://Themes/DialogTheme.tres" id="6_0arob"]
 [ext_resource type="Texture2D" uid="uid://b6y4smaqqdo1p" path="res://Assets/Images/UI/audioOn.png" id="6_l0gw7"]
 [ext_resource type="PackedScene" uid="uid://b5a2h1nfm8k8v" path="res://Upgrade.tscn" id="7_272bh"]
 [ext_resource type="Texture2D" uid="uid://cr2ohdmtpwgm3" path="res://Assets/Images/UI/audioOff.png" id="7_inymm"]
@@ -424,6 +425,21 @@ parameters/looping = true
 [node name="TapSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("3_5vw27")
 
+[node name="NewGameDialog" type="ConfirmationDialog" parent="."]
+oversampling_override = 1.0
+title = ""
+initial_position = 2
+unresizable = true
+borderless = true
+always_on_top = true
+unfocusable = true
+popup_window = true
+content_scale_mode = 1
+content_scale_aspect = 4
+theme = ExtResource("6_0arob")
+ok_button_text = "Confirm"
+dialog_text = "Start a new game?"
+
 [node name="Background" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_lwnsi")
 layout_mode = 1
@@ -562,7 +578,7 @@ lifetime = 1.75
 spread = 180.0
 gravity = Vector2(0, 0)
 initial_velocity_max = 128.0
-scale_amount_max = 4.0
+scale_amount_max = 10.0
 color = Color(0.9873206, 0.6809115, 0.7924389, 1)
 color_ramp = SubResource("Gradient_1bvp3")
 metadata/_edit_lock_ = true
@@ -594,17 +610,22 @@ value = 50.0
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
-anchor_top = 0.88
+anchor_top = 0.84
 anchor_right = 0.9
 anchor_bottom = 0.92
 alignment = 1
+
+[node name="StatsLabel" type="Label" parent="ProgressContainer2"]
+layout_mode = 2
+text = "00:00:00 - 9223372036854775807"
+horizontal_alignment = 1
 
 [node name="ProgressDisplay" type="MarginContainer" parent="ProgressContainer2"]
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="QuantaGoalProgress" type="ProgressBar" parent="ProgressContainer2/ProgressDisplay"]
-custom_minimum_size = Vector2(288, 0)
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("91_0abf2")
@@ -668,9 +689,9 @@ layout_mode = 2
 upgrade_id = "accelerator"
 upgrade_name = "Particle Accelerator"
 description = "+1 Quanta/tap"
-initial_cost = 50
-cost = 50
-max_level = 25
+initial_cost = 25
+cost = 25
+max_level = 50
 texture = ExtResource("7_kek77")
 
 [node name="Upgrade2" parent="UpgradeScrollContainer/UpgradesContainer" instance=ExtResource("7_272bh")]

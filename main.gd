@@ -31,12 +31,14 @@ extends Control
 @onready var upgrade3: Upgrade = $UpgradeScrollContainer/UpgradesContainer/Upgrade3
 @onready var upgrade4: Upgrade = $UpgradeScrollContainer/UpgradesContainer/Upgrade4
 
+@onready var new_game_dialog: ConfirmationDialog = $NewGameDialog
 @onready var new_game: TextureButton = $TopMenu/NewGame
 @onready var audio_on_off: TextureButton = $TopMenu/AudioOnOff
 @onready var music_on_off: TextureButton = $TopMenu/MusicOnOff
 @onready var stats_button: TextureButton = $TopMenu/StatsButton
 @onready var ad_boost: TextureButton = $TopMenu/AdBoost
 
+@onready var stats_label: Label = $ProgressContainer2/StatsLabel
 @onready var character_video: VideoStreamPlayer = $CharacterVideo
 
 var floating_label_scene := preload("res://floating_label.tscn")
@@ -49,8 +51,6 @@ var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
 
 @export var target_nodes: Array[NodePath]
-@export var pulse_strength := 1.1
-@export var pulse_speed := 6.0
 
 func _ready() -> void:
 	#print("MAIN ready")
@@ -91,7 +91,14 @@ func _ready() -> void:
 	upgrade4.upgrade_id = "entanglement"
 	
 	# Connect button signals
+	self.resized.connect(_on_resized)
 	beat_sync.beat.connect(pulse)
+	
+	new_game_dialog.confirmed.connect(_on_new_game_confirmed)
+	new_game_dialog.canceled.connect(_on_new_game_canceled)
+	
+	new_game_dialog.add_theme_font_override("font", Globals.FONT_KENNEY_FUTURE)
+	new_game_dialog.add_theme_font_size_override("font", Globals.UI_FONT_SIZE_LARGE)
 	
 	quantum_core.pressed.connect(_on_quantum_core_pressed)
 	
@@ -112,6 +119,9 @@ func _ready() -> void:
 	Gm.game_state_updated.connect(update_ui)
 	
 	# Apply custom themes
+	stats_label.add_theme_font_override("font", Globals.FONT_BPMONO)
+	stats_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_SMALL)
+
 	quanta_label.add_theme_font_override("font", Globals.QUANTA_LABEL_FONT)
 	quanta_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_NORMAL)
 
@@ -120,6 +130,8 @@ func _ready() -> void:
 	
 	quanta_goal_progress.value_changed.connect(_on_quanta_goal_progress_value_changed)
 	setup_progress_bar(quanta_goal_progress)
+
+	setup_h_scroll_bar()
 
 	# Update initial UI
 	particle_effect.emitting = false
@@ -137,6 +149,7 @@ func _ready() -> void:
 	audio_on_off.set_pressed_no_signal(!Gm.is_sound_on)
 	music_on_off.set_pressed_no_signal(!Gm.is_music_on)
 
+	beat_sync.beat_index = Gm.last_beat_index
 	audio_stream_player.play(Gm.music_last_position)
 
 	upgrade_scroll_container.get_h_scroll_bar().value = Gm.last_h_scrollbar_value
@@ -212,6 +225,10 @@ func _process(_delta: float) -> void:
 		if !Gm.has_character_video_dimensional_shift_info_played:
 			Gm.play_character_video_dimensional_shift_info = true
 
+	if upgrade4.is_enabled():
+		if !Gm.has_character_video_entanglement_array_info_played:
+			Gm.play_character_video_entanglement_array_info = true
+
 	if Gm.play_character_video_particle_accelerator_info:
 		if !Gm.has_character_video_particle_accelerator_info_played:
 			if character_video:
@@ -238,6 +255,15 @@ func _process(_delta: float) -> void:
 					character_video.visible = true
 					character_video.play()
 					Gm.has_character_video_dimensional_shift_info_played = true
+
+	if Gm.play_character_video_entanglement_array_info:
+		if !Gm.has_character_video_entanglement_array_info_played:
+			if character_video:
+				if !character_video.is_playing():
+					character_video.stream = Globals.ALIX_ENTANGLEMENT_ARRAY_INFO
+					character_video.visible = true
+					character_video.play()
+					Gm.has_character_video_entanglement_array_info_played = true
 
 	if Gm.is_sound_on:
 		character_video.volume = 1.0
@@ -273,17 +299,11 @@ func _process(_delta: float) -> void:
 				rotation_offset -= TAU
 
 			_material.set_shader_parameter("rotation_offset", rotation_offset)
-			
-			#var total_energy: float = get_live_frequency_data(_delta)
-			#circular_cascade_progress.scale = Vector2.ONE * (1.0 + total_energy * 3.0)
-			#print(str((total_energy * 3.0)))
-
-			#_material.set_shader_parameter("ring_thickness", rotation_offset)
 
 	for p in target_nodes:
 		var node = get_node(p)
-		node.scale = node.scale.lerp(Vector2.ONE, _delta * pulse_speed)
-		node.modulate = node.modulate.lerp(Color.WHITE, _delta * pulse_speed)
+		node.scale = node.scale.lerp(Vector2.ONE, _delta * Globals.PULSE_SPEED)
+		node.modulate = node.modulate.lerp(Color.WHITE, _delta * Globals.PULSE_SPEED)
 
 	update_ui()
 
@@ -342,6 +362,7 @@ func update_ui() -> void:
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
 	character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
+	stats_label.text = Gm.format_time(Gm.elapsed_timer) + " " + Gm.format_number(Globals.QUANTA_GOAL, " ")
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
 	cascade_progress.value = Gm.cascade_progress
 	quanta_goal_progress.value = Gm.quanta
@@ -508,7 +529,6 @@ func reset_game() -> void:
 	music_on_off.set_pressed_no_signal(!Gm.is_music_on)
 	audio_stream_player.play()
 	
-	#upgrade_scroll_container.get_h_scroll_bar().set_value_no_signal(Gm.last_h_scrollbar_value)
 	upgrade_scroll_container.get_h_scroll_bar().value = Gm.last_h_scrollbar_value
 
 	beat_sync.reset()
@@ -516,6 +536,11 @@ func reset_game() -> void:
 	update_ui()
 
 func _on_new_game_pressed() -> void:
+	Gm.is_game_paused = true
+	new_game_dialog.modulate.a = 0.0
+	new_game_dialog.popup_centered()
+
+func _on_new_game_confirmed() -> void:
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
 		if is_admob_initialized:
 			if admob.is_interstitial_ad_loaded():
@@ -525,6 +550,9 @@ func _on_new_game_pressed() -> void:
 				reset_game()
 	else:
 		reset_game()
+
+func _on_new_game_canceled() -> void:
+	Gm.is_game_paused = false
 
 func _on_ad_boost_pressed() -> void:
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
@@ -536,12 +564,13 @@ func _on_ad_boost_pressed() -> void:
 				#reset_game()
 
 func _on_quanta_changed(new_value: int) -> void:
-	circular_cascade_progress_rotation_speed = Gm.get_normalized_value(new_value, Globals.QUANTA_GOAL, Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED, 6.28)
+	if !Gm.has_reached_goal:
+		circular_cascade_progress_rotation_speed = Gm.get_normalized_value(new_value, Globals.QUANTA_GOAL, Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED, 6.28)
 
-	if new_value > Gm.last_quanta:
-		var gain := new_value - Gm.last_quanta
-		_show_quanta_gain(gain)
-	Gm.last_quanta = new_value
+		if new_value > Gm.last_quanta:
+			var gain := new_value - Gm.last_quanta
+			_show_quanta_gain(gain)
+		Gm.last_quanta = new_value
 
 func update_circular_cascade_progress(value: float) -> void:
 	if circular_cascade_progress.material:
@@ -561,10 +590,10 @@ func _on_cascade_progress_value_changed(value: float) -> void:
 			var cascade_progress_percentage: float = Gm.get_normalized_value(value, cascade_progress.max_value, 0.0, 1.0)
 			if cascade_progress_percentage >= Globals.CASCADE_ALIX_THRESHOLD_MIN:
 				if !Gm.has_character_video_pre_cascade_played_this_cascade:
-					print("Cascade" + str(cascade_progress.value) + " Value:" + str(value) + " MaxValue:" + str(cascade_progress.max_value))
+					#print("Cascade" + str(cascade_progress.value) + " Value:" + str(value) + " MaxValue:" + str(cascade_progress.max_value))
 					
 					character_video.visible = true
-					character_video.stream = Globals.ALIX_PRE_CASCADE
+					character_video.stream = [Globals.ALIX_PRE_CASCADE, Globals.ALIX_PRE_CASCADE_2][randi_range(0, 1)]
 					character_video.play()
 					Gm.has_character_video_pre_cascade_played_this_cascade = true
 
@@ -611,5 +640,37 @@ func get_live_frequency_data(_delta: float) -> float:
 func pulse():
 	for p in target_nodes:
 		var node = get_node(p)
-		node.scale = Vector2.ONE * pulse_strength
-		node.modulate = Color(1.2, 1.0, 1.0) # optional brief tint
+		node.scale = Vector2.ONE * Globals.PULSE_STRENGTH
+		node.modulate = Globals.PULSE_TINT_COLOR # optional brief tint
+
+func _on_resized() -> void:
+	if particle_effect:
+		if particle_effect.emitting:
+			particle_effect.emitting = false
+
+	if particle_effect_2:
+		if particle_effect_2.emitting:
+			particle_effect_2.emitting = false
+
+func setup_h_scroll_bar():
+	var scrollbar = upgrade_scroll_container.get_h_scroll_bar()
+	
+	#scrollbar.set_size(Vector2(scrollbar.size.x, 512.0))
+	#print(str(scrollbar.size.y))
+	# Create a StyleBox for the grabber
+	var grabber_style = StyleBoxFlat.new()
+	grabber_style.bg_color = Color(0.8, 0.2, 0.2) # Red grabber
+	grabber_style.set_corner_radius_all(5)
+	#grabber_style.border_width_left = 2
+	#grabber_style.border_color = Color(1, 1, 1) # White border
+
+	# Style for the track
+	#var track_style = StyleBoxFlat.new()
+	#track_style.bg_color = Color(0.2, 0.2, 0.2) # Dark gray
+
+	# Apply the style to the grabber
+	scrollbar.add_theme_stylebox_override("grabber", grabber_style)
+	#scrollbar.add_theme_stylebox_override("scroll", track_style)
+	
+	# Optionally, adjust other properties
+	#scrollbar.add_theme_color_override("grabber", Color(1, 1, 1)) # White grabber text/icon
