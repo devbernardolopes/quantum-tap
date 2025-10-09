@@ -19,6 +19,7 @@ config/icon="uid://dbvfcoxvhh1lg"
 [autoload]
 
 Gm="*res://gm.gd"
+ModalManager="*res://modal_manager.gd"
 
 [display]
 
