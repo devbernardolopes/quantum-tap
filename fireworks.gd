@@ -8,8 +8,9 @@ class_name Fireworks
 func _ready():
 	randomize()
 	_spawn_bursts()
-	await get_tree().create_timer(duration).timeout
-	queue_free()
+	if is_instance_valid(self):
+		await get_tree().create_timer(duration).timeout
+		queue_free()
 
 func _spawn_bursts() -> void:
 	for i in range(bursts):

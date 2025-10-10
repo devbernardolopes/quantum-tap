@@ -222,3 +222,36 @@ func _on_confirm() -> void:
 
 func _on_cancel() -> void:
 	_hide_and_cleanup(false)
+
+func show_okay(text: String, on_confirm: Callable) -> void:
+	if is_showing:
+		# If a modal is already up, ignore/replace behavior could be implemented.
+		return
+	_confirm_cb = on_confirm
+	_label.text = text
+	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	# show overlay + panel and animate fade-in
+	_overlay.visible = true
+	_panel.visible = true
+
+	# start hidden (modulate alpha = 0) then tween to visible
+	_overlay.modulate = Color(1, 1, 1, 0)
+	_panel.modulate = Color(1, 1, 1, 0)
+
+	# give the overlay a blocking mouse filter (already set) and set pause flag
+	Gm.is_game_paused = true
+	is_showing = true
+
+	# overlay fade to semi-transparent black (0.5 alpha) and panel to full
+	_overlay.create_tween().tween_property(_overlay, "modulate:a", 0.5, 0.16)
+	_panel.create_tween().tween_property(_panel, "modulate:a", 1.0, 0.16)
+
+	# Optionally give keyboard focus to Cancel or Confirm
+	#_btn_cancel.grab_focus()
+	#_btn_cancel.add_theme_constant_override("")
+	
+	_btn_confirm.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	
+	_btn_confirm.focus_mode = Control.FOCUS_NONE
+	_btn_cancel.visible = false

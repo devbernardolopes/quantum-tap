@@ -47,6 +47,9 @@ var floating_labels: Array[FloatingLabel] = []
 var circular_cascade_progress_rotation_speed: float = 0.0
 var circular_cascade_progress_ring_thickness: float = 0.01
 
+var fireworks: Fireworks = null
+var show_fireworks: bool = false
+
 var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
 
@@ -305,6 +308,13 @@ func _process(_delta: float) -> void:
 		node.scale = node.scale.lerp(Vector2.ONE, _delta * Globals.PULSE_SPEED)
 		node.modulate = node.modulate.lerp(Color.WHITE, _delta * Globals.PULSE_SPEED)
 
+	if Gm.has_reached_goal:
+		if !show_fireworks:
+			print("quanta goal")
+			print("show_fireworks = " + str(show_fireworks))
+			show_fireworks = true
+			on_victory()
+
 	update_ui()
 
 func _on_quantum_core_pressed() -> void:
@@ -515,7 +525,12 @@ func _on_interstitial_ad_loading_timer_timeout() -> void:
 
 func reset_game() -> void:
 	clear_all_labels()
-	
+
+	show_fireworks = false
+
+	if get_tree().current_scene.get_children().has(fireworks):
+		get_tree().current_scene.remove_child(fireworks)
+
 	character_video.visible = false
 	if character_video.is_playing():
 		character_video.stop()
@@ -553,7 +568,6 @@ func _on_new_game_confirmed() -> void:
 				reset_game()
 	else:
 		reset_game()
-	on_victory()
 
 func _on_new_game_canceled() -> void:
 	Gm.is_game_paused = false
@@ -681,7 +695,18 @@ func setup_h_scroll_bar():
 
 func on_victory():
 	Gm.is_game_paused = true
-	var fireworks := Fireworks.new()
-	get_tree().current_scene.add_child(fireworks)
-	await get_tree().create_timer(3.0).timeout
-	ModalManager.show_confirm("You reached the goal! Play again?", Callable(self, "start_new_game"))
+
+	Gm.delete_save_file()
+
+	if character_video:
+		if character_video.is_playing():
+			character_video.stop()
+			character_video.visible = false
+
+	if !fireworks:
+		if show_fireworks:
+			show_fireworks = false
+			fireworks = Fireworks.new()
+			get_tree().current_scene.add_child(fireworks)
+			await get_tree().create_timer(3.0).timeout
+			ModalManager.show_okay("You reached the Quanta goal!", Callable(self, "_on_new_game_confirmed"))

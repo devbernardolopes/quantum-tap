@@ -111,7 +111,8 @@ func _process(delta: float) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
-		save_game()
+		if !has_reached_goal:
+			save_game()
 
 func get_random_entanglement_quanta() -> int:
 	var result: int = 0
@@ -287,12 +288,16 @@ func reset_game() -> void:
 
 	last_quanta = quanta
 	# Delete save file
+	delete_save_file()
+	emit_signal("game_state_updated")
+
+func delete_save_file() -> void:
+	# Delete save file
 	var dir = DirAccess.open("user://")
 	if dir.file_exists("savegame.cfg"):
 		var error = dir.remove("savegame.cfg")
 		if error != OK:
 			print("Error deleting save file: ", error)
-	emit_signal("game_state_updated")
 
 # A function (or simply in _ready if Gm.gd is initialized after Main scene loads)
 func set_progress_bar_max_value(new_max_value: float):
@@ -365,7 +370,9 @@ func divide_goal(goal: int, levels: int) -> Array:
 	return result
 
 func format_time(seconds: int) -> String:
+	@warning_ignore("integer_division")
 	var h = int(seconds / 3600)
+	@warning_ignore("integer_division")
 	var m = int((seconds % 3600) / 60)
 	var s = seconds % 60
 	return "%02d:%02d:%02d" % [h, m, s]
