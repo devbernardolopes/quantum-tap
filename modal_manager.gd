@@ -98,6 +98,7 @@ func _create_ui() -> void:
 
 	var hb := HBoxContainer.new()
 	hb.alignment = BoxContainer.ALIGNMENT_CENTER
+	#hb.add_theme_constant_override("")
 	#hb.margin_top = 12
 	vb.add_child(hb)
 
@@ -116,25 +117,29 @@ func _create_ui() -> void:
 
 	# Panel style
 	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.07, 0.07, 0.08, 0.95)
-	panel_style.set_corner_radius_all(12)
+	panel_style.bg_color = Color(0.506, 0.173, 0.498, 0.949)
+	panel_style.set_corner_radius_all(24)
 	panel_style.shadow_size = 8
 	panel_style.shadow_color = Color(0, 0, 0, 0.5)
 	panel_style.content_margin_left = 12
 	panel_style.content_margin_right = 12
 	panel_style.content_margin_top = 12
-	panel_style.content_margin_bottom = 12
+	panel_style.content_margin_bottom = 32
 	theme.set_stylebox("panel", "Panel", panel_style)
 
 	# Button base style
 	var btn := StyleBoxFlat.new()
 	btn.bg_color = Color(0.14, 0.14, 0.14, 1.0)
+	btn.bg_color = Color(0.506, 0.173, 0.498, 0.949)
 	btn.content_margin_left = 10
 	btn.content_margin_right = 10
 	btn.content_margin_top = 6
 	btn.content_margin_bottom = 6
+	#btn.
 	btn.set_corner_radius_all(8)
+	#btn.se
 	theme.set_stylebox("normal", "Button", btn)
+	theme.set_font("font", "Button", Globals.FONT_KENNEY_FUTURE)
 
 	var btn_hover := btn.duplicate()
 	btn_hover.bg_color = Color(0.20, 0.20, 0.20, 1.0)
@@ -183,8 +188,14 @@ func show_confirm(text: String, on_confirm: Callable) -> void:
 
 	# Optionally give keyboard focus to Cancel or Confirm
 	#_btn_cancel.grab_focus()
+	#_btn_cancel.add_theme_constant_override("")
+	
+	_btn_cancel.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_btn_confirm.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	
 	_btn_cancel.focus_mode = Control.FOCUS_NONE
 	_btn_confirm.focus_mode = Control.FOCUS_NONE
+	
 
 func _hide_and_cleanup(call_cb: bool = false) -> void:
 	# fade out both, then hide and call callback if requested

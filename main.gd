@@ -553,6 +553,7 @@ func _on_new_game_confirmed() -> void:
 				reset_game()
 	else:
 		reset_game()
+	on_victory()
 
 func _on_new_game_canceled() -> void:
 	Gm.is_game_paused = false
@@ -677,3 +678,10 @@ func setup_h_scroll_bar():
 	
 	# Optionally, adjust other properties
 	#scrollbar.add_theme_color_override("grabber", Color(1, 1, 1)) # White grabber text/icon
+
+func on_victory():
+	Gm.is_game_paused = true
+	var fireworks := Fireworks.new()
+	get_tree().current_scene.add_child(fireworks)
+	await get_tree().create_timer(3.0).timeout
+	ModalManager.show_confirm("You reached the goal! Play again?", Callable(self, "start_new_game"))
