@@ -1,12 +1,14 @@
 extends Node2D
 class_name Fireworks
 
-@export var bursts := 6
-@export var area := Vector2(800, 600)
-@export var duration := 3.0
+var bursts: int = Globals.FIREWORKS_BURST_AMOUNT
+var area: Vector2 = Vector2(360, 800)
+var duration: float = 3.0
 
 func _ready():
 	randomize()
+	area = get_viewport().get_visible_rect().size
+
 	_spawn_bursts()
 	if is_instance_valid(self):
 		await get_tree().create_timer(duration).timeout
@@ -28,7 +30,7 @@ func _spawn_firework(pos: Vector2, color: Color) -> void:
 	particles.gravity = Vector2(0, 60)
 	particles.initial_velocity_min = 200.0
 	#particles.velocity_random = 0.6
-	particles.scale_amount_min = 0.8
+	particles.scale_amount_min = 1.8
 	#particles.scale_amount_random = 0.5
 	particles.spread = 180
 	particles.color = color

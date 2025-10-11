@@ -20,6 +20,7 @@ config/icon="uid://dbvfcoxvhh1lg"
 
 Gm="*res://gm.gd"
 ModalManager="*res://modal_manager.gd"
+FirebaseManager="*res://firebase_manager.gd"
 
 [display]
 

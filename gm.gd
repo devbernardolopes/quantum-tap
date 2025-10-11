@@ -1,5 +1,10 @@
 extends Node
 
+var player_quanta_spent: int = 0
+var player_quanta_generated: int = 0
+var player_quanta_per_second: int = 0
+var elapsed_timer: int = 0
+
 var is_game_paused: bool = false
 var current_level: int = 0
 var cascade_levels: Array = []
@@ -52,10 +57,10 @@ var upgrades: Dictionary = {
 
 signal game_state_updated
 signal quanta_changed(new_value: int)
+signal pause_state_changed
 
 var quanta_per_second_timer: Timer = null
 var game_timer: Timer = null
-var elapsed_timer: int = 0
 
 var has_reached_goal: bool = false
 
@@ -77,9 +82,10 @@ func _ready() -> void:
 	quanta_per_second_timer.start()
 
 	if !has_savegame():
-		cascade_levels = divide_goal(Globals.QUANTA_GOAL, Globals.QUANTA_LEVELS)
-		set_progress_bar_max_value(cascade_levels[current_level])
-		elapsed_timer = 0
+		reset_game()
+		#cascade_levels = divide_goal(Globals.QUANTA_GOAL, Globals.QUANTA_LEVELS)
+		#set_progress_bar_max_value(cascade_levels[current_level])
+		#elapsed_timer = 0
 	else:
 		load_game()
 
@@ -89,7 +95,7 @@ func _ready() -> void:
 	add_child(game_timer)
 	game_timer.start()
 	
-	is_game_paused = false
+	set_is_game_paused(false)
 
 @warning_ignore("unused_parameter")
 func _process(delta: float) -> void:
@@ -98,6 +104,7 @@ func _process(delta: float) -> void:
 	else:
 		if !has_reached_goal:
 			has_reached_goal = true
+			save_high_score()
 			quanta = Globals.QUANTA_GOAL
 
 	#if quanta_per_second > 0:
@@ -124,10 +131,14 @@ func get_random_entanglement_quanta() -> int:
 	return result
 
 func add_quanta(amount: int) -> void:
+	var real_amount: int = 0
 	if !is_game_paused:
 		if !has_reached_goal:
-			quanta += int(amount * multiplier) + get_random_entanglement_quanta()
+			real_amount = int(amount * multiplier) + get_random_entanglement_quanta()
+			player_quanta_generated += real_amount
+			quanta += real_amount
 			cascade_progress += amount
+			print(str(amount) + " " + str(real_amount))
 			if cascade_progress >= cascade_threshold:
 				trigger_cascade()
 
@@ -143,6 +154,7 @@ func purchase_upgrade(upgrade_id: String) -> bool:
 	var upgrade = upgrades[upgrade_id]
 	if quanta >= upgrade.cost:
 		quanta -= upgrade.cost
+		player_quanta_spent += upgrade.cost
 		upgrade.level = min(upgrade.level + 1, upgrade.max_level)
 		upgrade.cost = get_upgrade_cost(upgrade.cost, upgrade.level, upgrade.max_level, upgrade.initial_cost)
 		upgrade.effect.call()
@@ -163,6 +175,9 @@ func trigger_cascade() -> void:
 
 func save_game() -> void:
 	var config = ConfigFile.new()
+	config.set_value("game" , "player_quanta_generated", player_quanta_generated)
+	config.set_value("game" , "player_quanta_spent", player_quanta_spent)
+	config.set_value("game" , "player_quanta_per_second", player_quanta_per_second)
 	config.set_value("game" , "elapsed_timer", elapsed_timer)
 	config.set_value("game" , "cascade_levels", cascade_levels)
 	config.set_value("game" , "current_level", current_level)
@@ -205,6 +220,9 @@ func load_game() -> void:
 	if error != OK:
 		return  # No save file; use defaults
 
+	player_quanta_generated = config.get_value("game", "player_quanta_generated", 0)
+	player_quanta_spent = config.get_value("game", "player_quanta_spent", 0)
+	player_quanta_per_second = config.get_value("game", "player_quanta_per_second", 0)
 	elapsed_timer = config.get_value("game", "elapsed_timer", 0)
 	current_level = config.get_value("game", "current_level", 0)
 	cascade_levels = config.get_value("game", "cascade_levels", [])
@@ -250,7 +268,11 @@ func load_game() -> void:
 
 func reset_game() -> void:
 	# Reset game state to initial values
-	is_game_paused = false
+	player_quanta_generated = 0
+	player_quanta_spent = 0
+	player_quanta_per_second = 0
+	
+	set_is_game_paused(false)
 	elapsed_timer = 0
 	current_level = 0
 	has_reached_goal = false
@@ -316,11 +338,11 @@ func set_progress_bar_max_value(new_max_value: float):
 		progress_bar.max_value = new_max_value
 		progress_bar.value = cascade_progress
 
-	print("")
-	print(str(cascade_levels))
-	print(str(current_level))
-	print(str(cascade_levels[current_level]))
-	print(str(cascade_threshold))
+	#print("")
+	#print(str(cascade_levels))
+	#print(str(current_level))
+	#print(str(cascade_levels[current_level]))
+	#print(str(cascade_threshold))
 
 func format_number(value: int, delimiter: String) -> String:
 	var str_val := str(abs(value))
@@ -376,3 +398,60 @@ func format_time(seconds: int) -> String:
 	var m = int((seconds % 3600) / 60)
 	var s = seconds % 60
 	return "%02d:%02d:%02d" % [h, m, s]
+
+func send_request() -> void:
+	#HTTPRequest
+	pass
+
+func save_high_score():
+	var config = ConfigFile.new()
+	var file_path = "user://high_scores.cfg"
+	
+	# Load existing high scores to preserve them
+	var error = config.load(file_path)
+	if error != OK and error != ERR_FILE_NOT_FOUND:
+		print("Error loading existing high scores: ", error)
+		return
+	
+	# Determine the next section name based on existing sections
+	var section = "HighScore" + str(config.get_sections().size() + 1)
+	
+	# Save current stats as a new entry
+	config.set_value(section, "player_quanta_generated", player_quanta_generated)
+	config.set_value(section, "player_quanta_spent", player_quanta_spent)
+	config.set_value(section, "player_quanta_per_second", player_quanta_per_second)
+	config.set_value(section, "elapsed_timer", elapsed_timer)
+	
+	# Save the updated file (includes existing sections and new entry)
+	error = config.save(file_path)
+	if error != OK:
+		print("Error saving high score: ", error)
+
+func load_high_scores() -> Array:
+	var config = ConfigFile.new()
+	var file_path = "user://high_scores.cfg"
+	var high_scores = []
+	
+	# Load the file if it exists
+	var error = config.load(file_path)
+	if error != OK:
+		if error == ERR_FILE_NOT_FOUND:
+			return [] # Return empty array if file doesn't exist
+		print("Error loading high scores: ", error)
+		return []
+	
+	# Iterate through sections to collect all high score entries
+	for section in config.get_sections():
+		var score_entry = {
+			"player_quanta_generated": config.get_value(section, "player_quanta_generated", 0),
+			"player_quanta_spent": config.get_value(section, "player_quanta_spent", 0),
+			"player_quanta_per_second": config.get_value(section, "player_quanta_per_second", 0),
+			"elapsed_timer": config.get_value(section, "elapsed_timer", 0)
+		}
+		high_scores.append(score_entry)
+	
+	return high_scores
+
+func set_is_game_paused(value: bool):
+	is_game_paused = value
+	emit_signal("pause_state_changed")

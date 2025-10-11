@@ -8,12 +8,19 @@ var _layer: CanvasLayer
 var _overlay: ColorRect
 var _panel: PanelContainer
 var _label: Label
+var _grid_container: GridContainer
 var _btn_confirm: Button
 var _btn_cancel: Button
 var _confirm_cb: Callable = Callable()
 
 func _ready() -> void:
 	_create_ui()
+
+func _on_confirm() -> void:
+	_hide_and_cleanup(true)
+
+func _on_cancel() -> void:
+	_hide_and_cleanup(false)
 
 func _create_ui() -> void:
 	# CanvasLayer to ensure modal is above everything
@@ -45,18 +52,20 @@ func _create_ui() -> void:
 	_overlay.visible = false
 	_layer.add_child(_overlay)
 
+	var new_viewport_width: float = get_viewport().get_visible_rect().size.x
+
 	# Panel (dialog) in the center
 	_panel = PanelContainer.new()
 	_panel.visible = false
 	_panel.modulate = Color(1, 1, 1, 0)           # invisible at start (we'll fade it in)
 	_panel.name = "ConfirmPanel"
-	_panel.custom_minimum_size = Vector2(420, 140)
+	_panel.custom_minimum_size = Vector2(new_viewport_width / 4, 140)
 
 	# center the panel using anchors + margins
 	
 	_panel.set_anchor(SIDE_BOTTOM, 0.5)
-	_panel.set_anchor(SIDE_LEFT, 0.2)
-	_panel.set_anchor(SIDE_RIGHT, 0.8)
+	_panel.set_anchor(SIDE_LEFT, 0.0)
+	_panel.set_anchor(SIDE_RIGHT, 1.0)
 	_panel.set_anchor(SIDE_TOP, 0.5)
 	#_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_KEEP_SIZE, 70)
 	#_panel.set_offsets_preset(Control.PRESET_CENTER)
@@ -89,18 +98,31 @@ func _create_ui() -> void:
 	_panel.add_child(vb)
 
 	_label = Label.new()
-	_label.text = "Start a new game?"
+	#_label.text = "Start a new game?"
+	_label.text = "START A NEW GAME?"
 	_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	vb.add_child(_label)
 
+	var mc: MarginContainer = MarginContainer.new()
+	mc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	mc.add_theme_constant_override("margin_bottom", 32)
+	mc.add_theme_constant_override("margin_left", 16)
+	mc.add_theme_constant_override("margin_right", 16)
+	vb.add_child(mc)
+	
 	var hb := HBoxContainer.new()
 	hb.alignment = BoxContainer.ALIGNMENT_CENTER
-	#hb.add_theme_constant_override("")
-	#hb.margin_top = 12
-	vb.add_child(hb)
+	hb.set_anchors_preset(Control.PRESET_FULL_RECT)
+	mc.add_child(hb)
+
+	_grid_container = GridContainer.new()
+	_grid_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_grid_container.columns = 4
+	_grid_container.visible = false
+	hb.add_child(_grid_container)
 
 	_btn_cancel = Button.new()
 	_btn_cancel.text = "Cancel"
@@ -162,7 +184,6 @@ func _create_ui() -> void:
 	#hb.spacing = 8
 
 func show_confirm(text: String, on_confirm: Callable) -> void:
-	"""Show the modal with `text`. `on_confirm` may be null or a Callable to invoke on confirm."""
 	if is_showing:
 		# If a modal is already up, ignore/replace behavior could be implemented.
 		return
@@ -179,7 +200,7 @@ func show_confirm(text: String, on_confirm: Callable) -> void:
 	_panel.modulate = Color(1, 1, 1, 0)
 
 	# give the overlay a blocking mouse filter (already set) and set pause flag
-	Gm.is_game_paused = true
+	Gm.set_is_game_paused(true)
 	is_showing = true
 
 	# overlay fade to semi-transparent black (0.5 alpha) and panel to full
@@ -195,9 +216,10 @@ func show_confirm(text: String, on_confirm: Callable) -> void:
 	
 	_btn_cancel.focus_mode = Control.FOCUS_NONE
 	_btn_confirm.focus_mode = Control.FOCUS_NONE
-	
 
 func _hide_and_cleanup(call_cb: bool = false) -> void:
+	_grid_container.visible = false
+	
 	# fade out both, then hide and call callback if requested
 	var t1 = _overlay.create_tween()
 	t1.tween_property(_overlay, "modulate:a", 0.0, 0.12)
@@ -210,18 +232,12 @@ func _hide_and_cleanup(call_cb: bool = false) -> void:
 	t2.finished.connect(func() -> void:
 		_panel.visible = false
 		is_showing = false
-		Gm.is_game_paused = false
+		Gm.set_is_game_paused(false)
 		if call_cb and _confirm_cb.is_valid():
 			# run the provided callable safely
 			_confirm_cb.call()
 			_confirm_cb = Callable()
 	)
-
-func _on_confirm() -> void:
-	_hide_and_cleanup(true)
-
-func _on_cancel() -> void:
-	_hide_and_cleanup(false)
 
 func show_okay(text: String, on_confirm: Callable) -> void:
 	if is_showing:
@@ -240,7 +256,78 @@ func show_okay(text: String, on_confirm: Callable) -> void:
 	_panel.modulate = Color(1, 1, 1, 0)
 
 	# give the overlay a blocking mouse filter (already set) and set pause flag
-	Gm.is_game_paused = true
+	Gm.set_is_game_paused(true)
+	is_showing = true
+
+	# overlay fade to semi-transparent black (0.5 alpha) and panel to full
+	_overlay.create_tween().tween_property(_overlay, "modulate:a", 0.5, 0.16)
+	_panel.create_tween().tween_property(_panel, "modulate:a", 1.0, 0.16)
+
+	# Optionally give keyboard focus to Cancel or Confirm
+	#_btn_cancel.grab_focus()
+	#_btn_cancel.add_theme_constant_override("")
+	
+	_btn_confirm.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	
+	_btn_confirm.focus_mode = Control.FOCUS_NONE
+	_btn_cancel.visible = false
+
+func show_stats(text: String, on_confirm: Callable) -> void:
+	if is_showing:
+		# If a modal is already up, ignore/replace behavior could be implemented.
+		return
+	_confirm_cb = on_confirm
+	_label.text = text
+	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_grid_container.visible = true
+	
+	var high_scores: Array = Gm.load_high_scores()
+
+	if high_scores:
+		var l1: Label = Label.new()
+		l1.text = "Time"
+		var l2: Label = Label.new()
+		l2.text = "Quanta Generated"
+		var l3: Label = Label.new()
+		l3.text = "Quanta Spent"
+		var l4: Label = Label.new()
+		l4.text = "Quanta per Second"
+
+		_grid_container.add_child(l1)
+		_grid_container.add_child(l2)
+		_grid_container.add_child(l3)
+		_grid_container.add_child(l4)
+		
+		high_scores.sort_custom(func(a, b): return a.elapsed_timer < b.elapsed_timer)
+		
+		for i in high_scores.size():
+			var _l1: Label = Label.new()
+			_l1.text = Gm.format_time(high_scores[i].elapsed_timer)
+			var _l2: Label = Label.new()
+			_l2.text = str(high_scores[i].player_quanta_generated)
+			var _l3: Label = Label.new()
+			_l3.text = str(high_scores[i].player_quanta_spent)
+			var _l4: Label = Label.new()
+			_l4.text = str(high_scores[i].player_quanta_per_second)
+
+			_grid_container.add_child(_l1)
+			_grid_container.add_child(_l2)
+			_grid_container.add_child(_l3)
+			_grid_container.add_child(_l4)
+
+	# show overlay + panel and animate fade-in
+	_overlay.visible = true
+	_panel.visible = true
+
+	var theme := Theme.new()
+	theme.set_font("font", "Label", Globals.FONT_KENNEY_FUTURE)
+
+	# start hidden (modulate alpha = 0) then tween to visible
+	_overlay.modulate = Color(1, 1, 1, 0)
+	_panel.modulate = Color(1, 1, 1, 0)
+
+	# give the overlay a blocking mouse filter (already set) and set pause flag
+	Gm.set_is_game_paused(true)
 	is_showing = true
 
 	# overlay fade to semi-transparent black (0.5 alpha) and panel to full

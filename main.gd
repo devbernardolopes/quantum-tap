@@ -32,6 +32,8 @@ extends Control
 @onready var upgrade4: Upgrade = $UpgradeScrollContainer/UpgradesContainer/Upgrade4
 
 @onready var new_game_dialog: ConfirmationDialog = $NewGameDialog
+
+@onready var top_menu: HBoxContainer = $TopMenu
 @onready var new_game: TextureButton = $TopMenu/NewGame
 @onready var audio_on_off: TextureButton = $TopMenu/AudioOnOff
 @onready var music_on_off: TextureButton = $TopMenu/MusicOnOff
@@ -40,6 +42,9 @@ extends Control
 
 @onready var stats_label: Label = $ProgressContainer2/StatsLabel
 @onready var character_video: VideoStreamPlayer = $CharacterVideo
+@onready var character_video_input: Control = $CharacterVideo/CharacterVideoInput
+
+var has_character_video_started_playing: bool = false
 
 var floating_label_scene := preload("res://floating_label.tscn")
 var floating_labels: Array[FloatingLabel] = []
@@ -56,8 +61,6 @@ var interstitial_ad_loading_timer: Timer = null
 @export var target_nodes: Array[NodePath]
 
 func _ready() -> void:
-	#print("MAIN ready")
-
 	# Initialize AdMob plugin
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
 		admob.initialization_completed.connect(_on_admob_initialization_completed)
@@ -108,9 +111,12 @@ func _ready() -> void:
 	new_game.pressed.connect(_on_new_game_pressed)
 	audio_on_off.toggled.connect(_on_audio_on_off_toggled)
 	music_on_off.toggled.connect(_on_music_on_off_toggled)
+	stats_button.pressed.connect(_on_stats_button_pressed)
+	
 	ad_boost.pressed.connect(_on_ad_boost_pressed)
 	
 	character_video.finished.connect(_on_character_video_finished)
+	character_video_input.gui_input.connect(_on_character_video_input_gui_input)
 	
 	upgrade1.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("accelerator"))
 	upgrade2.get_node("IconButton").pressed.connect(_on_upgrade_pressed.bind("stabilizer"))
@@ -120,7 +126,8 @@ func _ready() -> void:
 	# Connect Gm signals
 	Gm.quanta_changed.connect(_on_quanta_changed)
 	Gm.game_state_updated.connect(update_ui)
-	
+	Gm.pause_state_changed.connect(_on_pause_state_changed)
+
 	# Apply custom themes
 	stats_label.add_theme_font_override("font", Globals.FONT_BPMONO)
 	stats_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_SMALL)
@@ -143,6 +150,7 @@ func _ready() -> void:
 	
 	character_video.visible = false
 	cascade_progress.value = 0
+	has_character_video_started_playing = false
 
 	update_circular_cascade_progress(0.0)
 
@@ -237,7 +245,9 @@ func _process(_delta: float) -> void:
 			if character_video:
 				if !character_video.is_playing():
 					character_video.stream = Globals.ALIX_PARTICLE_ACCELERATOR_INFO
+					character_video.modulate = Color.BLACK
 					character_video.visible = true
+					has_character_video_started_playing = true
 					character_video.play()
 					Gm.has_character_video_particle_accelerator_info_played = true
 
@@ -246,7 +256,9 @@ func _process(_delta: float) -> void:
 			if character_video:
 				if !character_video.is_playing():
 					character_video.stream = Globals.ALIX_QUANTUM_STABILIZER_INFO
+					character_video.modulate = Color.BLACK
 					character_video.visible = true
+					has_character_video_started_playing = true
 					character_video.play()
 					Gm.has_character_video_quantum_stabilizer_info_played = true
 
@@ -255,7 +267,9 @@ func _process(_delta: float) -> void:
 			if character_video:
 				if !character_video.is_playing():
 					character_video.stream = Globals.ALIX_DIMENSIONAL_SHIFT_INFO
+					character_video.modulate = Color.BLACK
 					character_video.visible = true
+					has_character_video_started_playing = true
 					character_video.play()
 					Gm.has_character_video_dimensional_shift_info_played = true
 
@@ -264,7 +278,9 @@ func _process(_delta: float) -> void:
 			if character_video:
 				if !character_video.is_playing():
 					character_video.stream = Globals.ALIX_ENTANGLEMENT_ARRAY_INFO
+					character_video.modulate = Color.BLACK
 					character_video.visible = true
+					has_character_video_started_playing = true
 					character_video.play()
 					Gm.has_character_video_entanglement_array_info_played = true
 
@@ -279,6 +295,11 @@ func _process(_delta: float) -> void:
 		if character_video:
 			if character_video.is_playing():
 				audio_stream_player.volume_linear = 0.35
+				
+				if has_character_video_started_playing:
+					var tween = create_tween()
+					tween.tween_property(character_video, "modulate", Color.WHITE, 1.0)
+					has_character_video_started_playing = false
 			else:
 				audio_stream_player.volume_linear = 1.0
 	else:
@@ -310,10 +331,15 @@ func _process(_delta: float) -> void:
 
 	if Gm.has_reached_goal:
 		if !show_fireworks:
-			print("quanta goal")
-			print("show_fireworks = " + str(show_fireworks))
 			show_fireworks = true
 			on_victory()
+
+	if Gm.is_game_paused:
+		if quantum_core_2d.is_playing():
+			quantum_core_2d.pause()
+	else:
+		if !quantum_core_2d.is_playing():
+			quantum_core_2d.play()
 
 	update_ui()
 
@@ -374,7 +400,7 @@ func update_ui() -> void:
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
 	character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
-	stats_label.text = Gm.format_time(Gm.elapsed_timer) + " " + Gm.format_number(Globals.QUANTA_GOAL, " ")
+	stats_label.text = Gm.format_time(Gm.elapsed_timer) + " " + Gm.format_number(Globals.QUANTA_GOAL, ".")
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
 	cascade_progress.value = Gm.cascade_progress
 	quanta_goal_progress.value = Gm.quanta
@@ -528,8 +554,14 @@ func reset_game() -> void:
 
 	show_fireworks = false
 
-	if get_tree().current_scene.get_children().has(fireworks):
-		get_tree().current_scene.remove_child(fireworks)
+	if fireworks:
+		if get_tree():
+			if get_tree().current_scene:
+				var children: Array = get_tree().current_scene.get_children()
+				if children:
+					if is_instance_valid(fireworks):
+						if children.has(fireworks):
+							get_tree().current_scene.remove_child(fireworks)
 
 	character_video.visible = false
 	if character_video.is_playing():
@@ -553,10 +585,10 @@ func reset_game() -> void:
 	update_ui()
 
 func _on_new_game_pressed() -> void:
-	Gm.is_game_paused = true
+	Gm.set_is_game_paused(true)
 	#new_game_dialog.modulate.a = 0.0
 	#new_game_dialog.popup_centered()
-	ModalManager.show_confirm("Start a new game?", Callable(self, "_on_new_game_confirmed"))
+	ModalManager.show_confirm("START A NEW GAME?", Callable(self, "_on_new_game_confirmed"))
 
 func _on_new_game_confirmed() -> void:
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
@@ -570,7 +602,7 @@ func _on_new_game_confirmed() -> void:
 		reset_game()
 
 func _on_new_game_canceled() -> void:
-	Gm.is_game_paused = false
+	Gm.set_is_game_paused(false)
 
 func _on_ad_boost_pressed() -> void:
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
@@ -612,13 +644,17 @@ func _on_cascade_progress_value_changed(value: float) -> void:
 					
 					character_video.visible = true
 					character_video.stream = [Globals.ALIX_PRE_CASCADE, Globals.ALIX_PRE_CASCADE_2][randi_range(0, 1)]
+					character_video.modulate = Color.BLACK
 					character_video.play()
+					has_character_video_started_playing = true
 					Gm.has_character_video_pre_cascade_played_this_cascade = true
 
 	update_circular_cascade_progress(value)
 
 func _on_character_video_finished() -> void:
 	character_video.visible = false
+	has_character_video_started_playing = false
+	character_video.modulate = Color.BLACK
 
 func _show_quanta_gain(gain: int) -> void:
 	var label_instance: FloatingLabel = floating_label_scene.instantiate()
@@ -694,7 +730,9 @@ func setup_h_scroll_bar():
 	#scrollbar.add_theme_color_override("grabber", Color(1, 1, 1)) # White grabber text/icon
 
 func on_victory():
-	Gm.is_game_paused = true
+	Gm.set_is_game_paused(true)
+
+	#Gm.save_high_score()
 
 	Gm.delete_save_file()
 
@@ -710,3 +748,26 @@ func on_victory():
 			get_tree().current_scene.add_child(fireworks)
 			await get_tree().create_timer(3.0).timeout
 			ModalManager.show_okay("You reached the Quanta goal!", Callable(self, "_on_new_game_confirmed"))
+
+func _on_character_video_input_gui_input(event: InputEvent) -> void:
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed):
+		if character_video:
+			if character_video.visible:
+				if character_video.is_playing():
+					character_video.stop()
+					character_video.visible = false
+					has_character_video_started_playing = false
+					character_video.modulate = Color.WHITE
+
+func _on_stats_button_pressed() -> void:
+	Gm.set_is_game_paused(true)
+	ModalManager.show_stats("HIGH SCORES", Callable())
+
+func _on_pause_state_changed():
+	update_menu_buttons()
+	#print(str(Gm.is_game_paused))
+
+func update_menu_buttons():
+	for child in top_menu.get_children():
+		if child is TextureButton:
+			child.disabled = Gm.is_game_paused
