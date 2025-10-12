@@ -55,6 +55,8 @@ var circular_cascade_progress_ring_thickness: float = 0.01
 var fireworks: Fireworks = null
 var show_fireworks: bool = false
 
+var modal: Modal = null
+
 var is_admob_initialized: bool = false
 var interstitial_ad_loading_timer: Timer = null
 
@@ -63,29 +65,30 @@ var interstitial_ad_loading_timer: Timer = null
 func _ready() -> void:
 	# Initialize AdMob plugin
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
-		admob.initialization_completed.connect(_on_admob_initialization_completed)
+		if Globals.IS_ADMOB_ACTIVE:
+			admob.initialization_completed.connect(_on_admob_initialization_completed)
 
-		admob.banner_ad_loaded.connect(_on_banner_ad_loaded)
-		admob.banner_ad_failed_to_load.connect(_on_banner_ad_failed_to_load)
+			admob.banner_ad_loaded.connect(_on_banner_ad_loaded)
+			admob.banner_ad_failed_to_load.connect(_on_banner_ad_failed_to_load)
 
-		admob.interstitial_ad_loaded.connect(_on_interstitial_ad_loaded)
-		admob.interstitial_ad_failed_to_load.connect(_on_interstitial_ad_failed_to_load)
-		admob.interstitial_ad_dismissed_full_screen_content.connect(_on_interstitial_ad_dismissed_full_screen_content)
+			admob.interstitial_ad_loaded.connect(_on_interstitial_ad_loaded)
+			admob.interstitial_ad_failed_to_load.connect(_on_interstitial_ad_failed_to_load)
+			admob.interstitial_ad_dismissed_full_screen_content.connect(_on_interstitial_ad_dismissed_full_screen_content)
 
-		admob.rewarded_ad_loaded.connect(_on_rewarded_ad_loaded)
-		admob.rewarded_ad_failed_to_load.connect(_on_rewarded_ad_failed_to_load)
-		admob.rewarded_ad_user_earned_reward.connect(_on_rewarded_ad_user_earned_reward)
+			admob.rewarded_ad_loaded.connect(_on_rewarded_ad_loaded)
+			admob.rewarded_ad_failed_to_load.connect(_on_rewarded_ad_failed_to_load)
+			admob.rewarded_ad_user_earned_reward.connect(_on_rewarded_ad_user_earned_reward)
 
-		#admob.rewarded_interstitial_ad_loaded.connect(_on_rewarded_interstitial_ad_loaded)
-		#admob.rewarded_interstitial_ad_failed_to_load.connect(_on_rewarded_interstitial_ad_failed_to_load)
-		#admob.rewarded_interstitial_ad_user_earned_reward.connect(_on_rewarded_interstitial_ad_user_earned_reward)
+			#admob.rewarded_interstitial_ad_loaded.connect(_on_rewarded_interstitial_ad_loaded)
+			#admob.rewarded_interstitial_ad_failed_to_load.connect(_on_rewarded_interstitial_ad_failed_to_load)
+			#admob.rewarded_interstitial_ad_user_earned_reward.connect(_on_rewarded_interstitial_ad_user_earned_reward)
 
-		interstitial_ad_loading_timer = Timer.new()
-		interstitial_ad_loading_timer.wait_time = 1.0
-		interstitial_ad_loading_timer.timeout.connect(_on_interstitial_ad_loading_timer_timeout)
-		
-		if !is_admob_initialized:
-			admob.initialize()
+			interstitial_ad_loading_timer = Timer.new()
+			interstitial_ad_loading_timer.wait_time = 1.0
+			interstitial_ad_loading_timer.timeout.connect(_on_interstitial_ad_loading_timer_timeout)
+			
+			if !is_admob_initialized:
+				admob.initialize()
 	else:
 		ad_boost.disabled = true
 		ad_boost.visible = false
@@ -112,6 +115,8 @@ func _ready() -> void:
 	audio_on_off.toggled.connect(_on_audio_on_off_toggled)
 	music_on_off.toggled.connect(_on_music_on_off_toggled)
 	stats_button.pressed.connect(_on_stats_button_pressed)
+	
+	stats_button.visible = false
 	
 	ad_boost.pressed.connect(_on_ad_boost_pressed)
 	
@@ -398,7 +403,7 @@ func update_ui() -> void:
 	particle_effect.position = quantum_core.position + (quantum_core.size / 2)
 	particle_effect_2.position = quantum_core.position + (quantum_core.size / 2)
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
-	character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
+	#character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
 	stats_label.text = Gm.format_time(Gm.elapsed_timer) + " " + Gm.format_number(Globals.QUANTA_GOAL, ".")
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
@@ -705,6 +710,10 @@ func _on_resized() -> void:
 	if particle_effect_2:
 		if particle_effect_2.emitting:
 			particle_effect_2.emitting = false
+	
+	#if character_video:
+		#character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
+		#character_video.position = 
 
 func setup_h_scroll_bar():
 	var scrollbar = upgrade_scroll_container.get_h_scroll_bar()
@@ -760,8 +769,13 @@ func _on_character_video_input_gui_input(event: InputEvent) -> void:
 					character_video.modulate = Color.WHITE
 
 func _on_stats_button_pressed() -> void:
+	pass
 	Gm.set_is_game_paused(true)
-	ModalManager.show_stats("HIGH SCORES", Callable())
+	modal = load("res://modal_dialog.tscn").instantiate()
+	add_child(modal)
+	modal.show_modal("HIGH SCORES", Callable())
+	
+	#ModalManager.show_stats("HIGH SCORES", Callable())
 
 func _on_pause_state_changed():
 	update_menu_buttons()

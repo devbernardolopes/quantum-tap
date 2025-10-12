@@ -1,5 +1,7 @@
 class_name Globals
 
+const IS_ADMOB_ACTIVE: bool = false
+
 const UI_FONT_SIZE_SMALLER: int = 12
 const UI_FONT_SIZE_SMALL: int = 14
 const UI_FONT_SIZE_NORMAL: int = 20
@@ -106,8 +108,8 @@ const ENTANGLEMENT_COST: int = 150
 const ENTANGLEMENT_LEVEL: int = 0
 const ENTANGLEMENT_MAX_LEVEL: int = 15
 
-const QUANTA_LEVELS: int = 6
-const QUANTA_GOAL: int = QUANTA_GOAL_DEBUG
+const QUANTA_LEVELS: int = 50
+const QUANTA_GOAL: int = QUANTA_GOAL_MEDIUM
 const QUANTA_GOAL_DEBUG: int = 100
 const QUANTA_GOAL_EASY: int = 775807
 const QUANTA_GOAL_NORMAL: int = 775807 * 2
@@ -125,7 +127,3 @@ const PULSE_SPEED: float = 4.0
 const PULSE_TINT_COLOR: Color = Color(1.2, 1.0, 1.0)
 
 const FIREWORKS_BURST_AMOUNT: int = 12
-
-const FIREBASE_PROJECT_ID: String = "quantum-tap-game"
-const FIREBASE_APP_API_KEY: String = "AIzaSyCCElu5f2mP2V7_C8RjMdyHHlC3xAtBv1E"
-const FIREBASE_APP_ID: String = "1:449021896229:web:35ed4116376cdc446a41cc"

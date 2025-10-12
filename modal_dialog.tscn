@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://ck2jupoun2ph4"]
+
+[ext_resource type="PackedScene" uid="uid://bi64so71wohuc" path="res://modal.tscn" id="1_kudjh"]
+[ext_resource type="Script" uid="uid://b6smy3nxnrncq" path="res://modal_dialog.gd" id="2_m5rqy"]
+[ext_resource type="FontFile" uid="uid://cjnikf71bgod7" path="res://Assets/Fonts/Kenney Future Narrow.ttf" id="3_q2qqb"]
+
+[node name="ModalDialog" instance=ExtResource("1_kudjh")]
+script = ExtResource("2_m5rqy")
+
+[node name="Panel" parent="." index="1"]
+anchors_preset = 14
+
+[node name="CancelButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/HBoxContainer" index="0"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("3_q2qqb")
+text = "CANCEL
+"

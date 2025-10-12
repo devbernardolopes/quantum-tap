@@ -1,5 +1,7 @@
 extends Node
 
+var is_modal_showing: bool = false
+
 var player_quanta_spent: int = 0
 var player_quanta_generated: int = 0
 var player_quanta_per_second: int = 0
