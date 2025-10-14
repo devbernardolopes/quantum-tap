@@ -6,7 +6,6 @@
 [ext_resource type="AudioStream" uid="uid://boh5pg77kbihf" path="res://Assets/Musics/cyberpunk_arcade_3.mp3" id="4_0arob"]
 [ext_resource type="Shader" uid="uid://dn1i5dvuqxadu" path="res://Shaders/starfield.gdshader" id="4_53bls"]
 [ext_resource type="Script" uid="uid://nvn78jfwnkut" path="res://beat_sync.gd" id="4_jcxqu"]
-[ext_resource type="Texture2D" uid="uid://kontrd2p667x" path="res://Assets/Images/UI/boomerang-sun.png" id="5_n5t1e"]
 [ext_resource type="Texture2D" uid="uid://cwi2hgecpmqe6" path="res://Assets/Images/UI/return.png" id="5_yjja3"]
 [ext_resource type="Theme" uid="uid://c6gvdvf78c64b" path="res://Themes/DialogTheme.tres" id="6_0arob"]
 [ext_resource type="Texture2D" uid="uid://b6y4smaqqdo1p" path="res://Assets/Images/UI/audioOn.png" id="6_l0gw7"]
@@ -19,10 +18,11 @@
 [ext_resource type="Texture2D" uid="uid://bwl6h3la0qaaj" path="res://Assets/Images/UI/musicOff.png" id="9_0arob"]
 [ext_resource type="Texture2D" uid="uid://cm85uhkhkcbp1" path="res://Assets/Images/Upgrades/Dimensional Shift.png" id="9_4c57u"]
 [ext_resource type="Texture2D" uid="uid://bdvwpv45rx3wl" path="res://Assets/Images/QuantumCore/frame_0001.png" id="10_yysqy"]
-[ext_resource type="Texture2D" uid="uid://dwa10x82qcyls" path="res://Assets/Images/UI/trophy.png" id="11_dij0e"]
 [ext_resource type="Texture2D" uid="uid://bkyc1ll4yhq0g" path="res://Assets/Images/QuantumCore/frame_0002.png" id="11_n5t1e"]
 [ext_resource type="Texture2D" uid="uid://bc765r8qnl8lm" path="res://Assets/Images/QuantumCore/frame_0003.png" id="12_h6isl"]
+[ext_resource type="Texture2D" uid="uid://cwxiq3u61ahro" path="res://Assets/Images/UI/star.png" id="13_0arob"]
 [ext_resource type="Texture2D" uid="uid://wp0f2pucfyr5" path="res://Assets/Images/QuantumCore/frame_0004.png" id="13_53bls"]
+[ext_resource type="Texture2D" uid="uid://3uj35g2q3bun" path="res://Assets/Images/UI/leaderboardsComplex.png" id="14_0arob"]
 [ext_resource type="Texture2D" uid="uid://bgd6l2edrcgvi" path="res://Assets/Images/QuantumCore/frame_0005.png" id="14_lwnsi"]
 [ext_resource type="Texture2D" uid="uid://2d0pjkp6nlj4" path="res://Assets/Images/QuantumCore/frame_0006.png" id="15_41lik"]
 [ext_resource type="Texture2D" uid="uid://dq3pc2ekqmlbd" path="res://Assets/Images/QuantumCore/frame_0007.png" id="16_jbvwl"]
@@ -107,7 +107,7 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lwnsi"]
 shader = ExtResource("4_53bls")
-shader_parameter/dimensions = Vector2(1024, 600)
+shader_parameter/dimensions = Vector2(1024, 1024)
 shader_parameter/small_stars = 111.0
 shader_parameter/small_stars_far_size = 0.5
 shader_parameter/small_stars_near_size = 1.0
@@ -116,7 +116,7 @@ shader_parameter/large_stars_far_size = 0.5
 shader_parameter/large_stars_near_size = 1.0
 shader_parameter/far_stars_color = Color(0.5, 0, 1, 1)
 shader_parameter/near_stars_color = Color(1, 1, 1, 1)
-shader_parameter/base_scroll_speed = 0.0999999977648
+shader_parameter/base_scroll_speed = 0.05
 shader_parameter/additional_scroll_speed = 0.05
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ryg4g"]
@@ -375,9 +375,9 @@ shader = ExtResource("8_41lik")
 shader_parameter/progress = 0.5
 shader_parameter/ring_thickness = 0.07000000262648
 shader_parameter/ring_radius = 0.40000001574012
-shader_parameter/progress_color = Color(1, 0.5, 1, 1)
+shader_parameter/progress_color = Color(0, 1, 1, 1)
 shader_parameter/background_color = Color(0.19966345, 0.19966345, 0.19966345, 0.5)
-shader_parameter/gradient_color = Color(0.5, 0.2, 1, 1)
+shader_parameter/gradient_color = Color(0.22352941, 1, 0.078431375, 1)
 shader_parameter/smoothness = 0.01
 shader_parameter/gradient_strength = 1.0
 shader_parameter/use_gradient = true
@@ -496,16 +496,23 @@ visible = false
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-texture_normal = ExtResource("5_n5t1e")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="BackgroundOnOff" type="TextureButton" parent="TopMenu"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+texture_normal = ExtResource("13_0arob")
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="StatsButton" type="TextureButton" parent="TopMenu"]
-visible = false
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 focus_mode = 0
-texture_normal = ExtResource("11_dij0e")
+texture_normal = ExtResource("14_0arob")
 ignore_texture_size = true
 stretch_mode = 5
 
@@ -706,8 +713,8 @@ layout_mode = 2
 upgrade_id = "accelerator"
 upgrade_name = "Particle Accelerator"
 description = "+1 Quanta/tap"
-initial_cost = 25
-cost = 25
+initial_cost = 10
+cost = 10
 max_level = 50
 texture = ExtResource("7_kek77")
 

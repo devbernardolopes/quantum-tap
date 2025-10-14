@@ -37,6 +37,7 @@ extends Control
 @onready var new_game: TextureButton = $TopMenu/NewGame
 @onready var audio_on_off: TextureButton = $TopMenu/AudioOnOff
 @onready var music_on_off: TextureButton = $TopMenu/MusicOnOff
+@onready var background_on_off: TextureButton = $TopMenu/BackgroundOnOff
 @onready var stats_button: TextureButton = $TopMenu/StatsButton
 @onready var ad_boost: TextureButton = $TopMenu/AdBoost
 
@@ -112,11 +113,12 @@ func _ready() -> void:
 	quantum_core.pressed.connect(_on_quantum_core_pressed)
 	
 	new_game.pressed.connect(_on_new_game_pressed)
+	background_on_off.toggled.connect(_on_background_on_off_toggled)
 	audio_on_off.toggled.connect(_on_audio_on_off_toggled)
 	music_on_off.toggled.connect(_on_music_on_off_toggled)
 	stats_button.pressed.connect(_on_stats_button_pressed)
 	
-	stats_button.visible = false
+	#stats_button.visible = false
 	
 	ad_boost.pressed.connect(_on_ad_boost_pressed)
 	
@@ -134,7 +136,7 @@ func _ready() -> void:
 	Gm.pause_state_changed.connect(_on_pause_state_changed)
 
 	# Apply custom themes
-	stats_label.add_theme_font_override("font", Globals.FONT_BPMONO)
+	stats_label.add_theme_font_override("font", Globals.FONT_KENNEY_FUTURE_NARROW)
 	stats_label.add_theme_font_size_override("font_size", Globals.UI_FONT_SIZE_SMALL)
 
 	quanta_label.add_theme_font_override("font", Globals.QUANTA_LABEL_FONT)
@@ -160,8 +162,9 @@ func _ready() -> void:
 	update_circular_cascade_progress(0.0)
 
 	quanta_goal_progress.value = 0
-	quanta_goal_progress.max_value = Globals.QUANTA_GOAL
+	quanta_goal_progress.max_value = Gm.player_quanta_goal
 
+	background_on_off.set_pressed_no_signal(!Gm.is_background_on)
 	audio_on_off.set_pressed_no_signal(!Gm.is_sound_on)
 	music_on_off.set_pressed_no_signal(!Gm.is_music_on)
 
@@ -289,6 +292,11 @@ func _process(_delta: float) -> void:
 					character_video.play()
 					Gm.has_character_video_entanglement_array_info_played = true
 
+	if Gm.is_background_on:
+		background.visible = true
+	else:
+		background.visible = false
+
 	if Gm.is_sound_on:
 		character_video.volume = 1.0
 	else:
@@ -300,11 +308,6 @@ func _process(_delta: float) -> void:
 		if character_video:
 			if character_video.is_playing():
 				audio_stream_player.volume_linear = 0.35
-				
-				if has_character_video_started_playing:
-					var tween = create_tween()
-					tween.tween_property(character_video, "modulate", Color.WHITE, 1.0)
-					has_character_video_started_playing = false
 			else:
 				audio_stream_player.volume_linear = 1.0
 	else:
@@ -338,6 +341,13 @@ func _process(_delta: float) -> void:
 		if !show_fireworks:
 			show_fireworks = true
 			on_victory()
+
+	if character_video:
+		if character_video.is_playing():
+			if has_character_video_started_playing:
+				var tween = create_tween()
+				tween.tween_property(character_video, "modulate", Color.WHITE, 1.0)
+				has_character_video_started_playing = false
 
 	if Gm.is_game_paused:
 		if quantum_core_2d.is_playing():
@@ -405,7 +415,7 @@ func update_ui() -> void:
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
 	#character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
-	stats_label.text = Gm.format_time(Gm.elapsed_timer) + " " + Gm.format_number(Globals.QUANTA_GOAL, ".")
+	stats_label.text = Gm.format_time(Gm.elapsed_timer) + " " + Gm.format_number(Gm.player_quanta_goal, " ")
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
 	cascade_progress.value = Gm.cascade_progress
 	quanta_goal_progress.value = Gm.quanta
@@ -591,8 +601,6 @@ func reset_game() -> void:
 
 func _on_new_game_pressed() -> void:
 	Gm.set_is_game_paused(true)
-	#new_game_dialog.modulate.a = 0.0
-	#new_game_dialog.popup_centered()
 	ModalManager.show_confirm("START A NEW GAME?", Callable(self, "_on_new_game_confirmed"))
 
 func _on_new_game_confirmed() -> void:
@@ -620,7 +628,7 @@ func _on_ad_boost_pressed() -> void:
 
 func _on_quanta_changed(new_value: int) -> void:
 	if !Gm.has_reached_goal:
-		circular_cascade_progress_rotation_speed = Gm.get_normalized_value(new_value, Globals.QUANTA_GOAL, Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED, 6.28)
+		circular_cascade_progress_rotation_speed = Gm.get_normalized_value(new_value, Gm.player_quanta_goal, Globals.CIRCULAR_CASCADE_PROGRESS_ROTATION_SPEED, TAU * 2) # 6.28)
 
 		if new_value > Gm.last_quanta:
 			var gain := new_value - Gm.last_quanta
@@ -677,9 +685,24 @@ func clear_all_labels() -> void:
 
 func _on_audio_on_off_toggled(toggled_on: bool) -> void:
 	Gm.is_sound_on = !toggled_on
+	if Gm.is_sound_on:
+		audio_on_off.modulate = Color.WHITE
+	else:
+		audio_on_off.modulate = Color(Color.WHITE, 0.5)
 
 func _on_music_on_off_toggled(toggled_on: bool) -> void:
 	Gm.is_music_on = !toggled_on
+	if Gm.is_music_on:
+		music_on_off.modulate = Color.WHITE
+	else:
+		music_on_off.modulate = Color(Color.WHITE, 0.5)
+
+func _on_background_on_off_toggled(toggled_on: bool) -> void:
+	Gm.is_background_on = !toggled_on
+	if Gm.is_background_on:
+		background_on_off.modulate = Color.WHITE
+	else:
+		background_on_off.modulate = Color(Color.WHITE, 0.5)
 
 func get_live_frequency_data(_delta: float) -> float:
 	var low = spectrum.get_magnitude_for_frequency_range(20, 250)  # Bass
@@ -769,13 +792,13 @@ func _on_character_video_input_gui_input(event: InputEvent) -> void:
 					character_video.modulate = Color.WHITE
 
 func _on_stats_button_pressed() -> void:
-	pass
+	#pass
 	Gm.set_is_game_paused(true)
-	modal = load("res://modal_dialog.tscn").instantiate()
-	add_child(modal)
-	modal.show_modal("HIGH SCORES", Callable())
-	
-	#ModalManager.show_stats("HIGH SCORES", Callable())
+	#modal = load("res://modal_dialog.tscn").instantiate()
+	#add_child(modal)
+	#modal.show_modal("HIGH SCORES", Callable())
+	#
+	ModalManager.show_stats("HIGH SCORES", Callable())
 
 func _on_pause_state_changed():
 	update_menu_buttons()
@@ -784,4 +807,10 @@ func _on_pause_state_changed():
 func update_menu_buttons():
 	for child in top_menu.get_children():
 		if child is TextureButton:
+			#child.text
+			if child.texture_pressed:
+				if child.button_pressed:
+					child.texture_disabled = child.texture_pressed
+				else:
+					child.texture_disabled = child.texture_normal
 			child.disabled = Gm.is_game_paused

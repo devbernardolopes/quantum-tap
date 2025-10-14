@@ -5,6 +5,7 @@ var is_modal_showing: bool = false
 var player_quanta_spent: int = 0
 var player_quanta_generated: int = 0
 var player_quanta_per_second: int = 0
+var player_quanta_goal: int = 0
 var elapsed_timer: int = 0
 
 var is_game_paused: bool = false
@@ -24,6 +25,7 @@ var quanta: int:
 		_quanta_internal = value
 		emit_signal("quanta_changed", value)
 
+var is_background_on: bool = true
 var is_sound_on: bool = true
 var is_music_on: bool = true
 
@@ -101,13 +103,13 @@ func _ready() -> void:
 
 @warning_ignore("unused_parameter")
 func _process(delta: float) -> void:
-	if quanta < Globals.QUANTA_GOAL:
+	if quanta < player_quanta_goal:
 		has_reached_goal = false
 	else:
 		if !has_reached_goal:
 			has_reached_goal = true
 			save_high_score()
-			quanta = Globals.QUANTA_GOAL
+			quanta = player_quanta_goal
 
 	#if quanta_per_second > 0:
 		## Accumulate fractional Quanta
@@ -167,22 +169,24 @@ func trigger_cascade() -> void:
 	if !has_reached_goal:
 		var bonus = quanta * (1.0 + upgrades.accelerator.level * 0.1)
 		quanta += int(bonus)
-		cascade_progress = 0.0
-		current_level += 1
-		#cascade_threshold *= Globals.CASCADE_THRESHOLD_MULTIPLIER
-		cascade_threshold = cascade_levels[current_level]
-		#cascade_threshold = min(cascade_threshold, Globals.MAX_CASCADE_THRESHOLD)
-		set_progress_bar_max_value(cascade_threshold)
-		has_character_video_pre_cascade_played_this_cascade = false
+		player_quanta_generated += int(bonus)
+		if current_level + 1 < Globals.QUANTA_LEVELS:
+			cascade_progress = 0.0
+			current_level += 1
+			cascade_threshold = cascade_levels[current_level]
+			set_progress_bar_max_value(cascade_threshold)
+			has_character_video_pre_cascade_played_this_cascade = false
 
 func save_game() -> void:
 	var config = ConfigFile.new()
 	config.set_value("game" , "player_quanta_generated", player_quanta_generated)
 	config.set_value("game" , "player_quanta_spent", player_quanta_spent)
 	config.set_value("game" , "player_quanta_per_second", player_quanta_per_second)
+	config.set_value("game" , "player_quanta_goal", player_quanta_goal)
 	config.set_value("game" , "elapsed_timer", elapsed_timer)
 	config.set_value("game" , "cascade_levels", cascade_levels)
 	config.set_value("game" , "current_level", current_level)
+	config.set_value("game" , "is_background_on", is_background_on)
 	config.set_value("game" , "is_sound_on", is_sound_on)
 	config.set_value("game" , "is_music_on", is_music_on)
 	config.set_value("game" , "music_last_position", music_last_position)
@@ -225,9 +229,11 @@ func load_game() -> void:
 	player_quanta_generated = config.get_value("game", "player_quanta_generated", 0)
 	player_quanta_spent = config.get_value("game", "player_quanta_spent", 0)
 	player_quanta_per_second = config.get_value("game", "player_quanta_per_second", 0)
+	player_quanta_goal = config.get_value("game", "player_quanta_goal", 0)
 	elapsed_timer = config.get_value("game", "elapsed_timer", 0)
 	current_level = config.get_value("game", "current_level", 0)
 	cascade_levels = config.get_value("game", "cascade_levels", [])
+	is_background_on = config.get_value("game", "is_background_on", true)
 	is_sound_on = config.get_value("game", "is_sound_on", true)
 	is_music_on = config.get_value("game", "is_music_on", true)
 	music_last_position = config.get_value("game", "music_last_position", 0.0)
@@ -273,6 +279,7 @@ func reset_game() -> void:
 	player_quanta_generated = 0
 	player_quanta_spent = 0
 	player_quanta_per_second = 0
+	player_quanta_goal = Globals.QUANTA_GOAL
 	
 	set_is_game_paused(false)
 	elapsed_timer = 0
@@ -298,7 +305,7 @@ func reset_game() -> void:
 	quanta_per_second = 0
 	multiplier = 1.0
 	cascade_progress = 0.0
-	cascade_levels = divide_goal(Globals.QUANTA_GOAL, Globals.QUANTA_LEVELS)
+	cascade_levels = divide_goal(player_quanta_goal, Globals.QUANTA_LEVELS)
 	cascade_threshold = cascade_levels[current_level]
 	quanta_accumulator = 0.0
 	upgrades = {
@@ -393,17 +400,16 @@ func divide_goal(goal: int, levels: int) -> Array:
 		result[levels - 1 - i] += 1  # add leftover points to the last levels
 	return result
 
-func format_time(seconds: int) -> String:
+func format_time(seconds: int, show_hour: bool = false) -> String:
 	@warning_ignore("integer_division")
 	var h = int(seconds / 3600)
 	@warning_ignore("integer_division")
 	var m = int((seconds % 3600) / 60)
 	var s = seconds % 60
-	return "%02d:%02d:%02d" % [h, m, s]
-
-func send_request() -> void:
-	#HTTPRequest
-	pass
+	if show_hour:
+		return "%02d:%02d:%02d" % [h, m, s]
+	else:
+		return "%02d:%02d" % [m, s]
 
 func save_high_score():
 	var config = ConfigFile.new()
@@ -422,6 +428,7 @@ func save_high_score():
 	config.set_value(section, "player_quanta_generated", player_quanta_generated)
 	config.set_value(section, "player_quanta_spent", player_quanta_spent)
 	config.set_value(section, "player_quanta_per_second", player_quanta_per_second)
+	config.set_value(section, "player_quanta_goal", player_quanta_goal)
 	config.set_value(section, "elapsed_timer", elapsed_timer)
 	
 	# Save the updated file (includes existing sections and new entry)
@@ -448,6 +455,7 @@ func load_high_scores() -> Array:
 			"player_quanta_generated": config.get_value(section, "player_quanta_generated", 0),
 			"player_quanta_spent": config.get_value(section, "player_quanta_spent", 0),
 			"player_quanta_per_second": config.get_value(section, "player_quanta_per_second", 0),
+			"player_quanta_goal": config.get_value(section, "player_quanta_goal", 0),
 			"elapsed_timer": config.get_value(section, "elapsed_timer", 0)
 		}
 		high_scores.append(score_entry)

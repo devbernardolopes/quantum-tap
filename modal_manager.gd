@@ -105,6 +105,16 @@ func _create_ui() -> void:
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	vb.add_child(_label)
+	
+	_grid_container = GridContainer.new()
+	_grid_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_grid_container.columns = 5
+	_grid_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	#_grid_container.SIZE_EXPAND = Control.SIZE_EXPAND_FILL
+	_grid_container.visible = false
+	_grid_container.add_theme_constant_override("h_separation", 16)
+	_grid_container.add_theme_constant_override("v_separation", 4)
+	vb.add_child(_grid_container)
 
 	var mc: MarginContainer = MarginContainer.new()
 	mc.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -112,18 +122,12 @@ func _create_ui() -> void:
 	mc.add_theme_constant_override("margin_left", 16)
 	mc.add_theme_constant_override("margin_right", 16)
 	vb.add_child(mc)
-	
+
 	var hb := HBoxContainer.new()
 	hb.alignment = BoxContainer.ALIGNMENT_CENTER
 	hb.set_anchors_preset(Control.PRESET_FULL_RECT)
 	mc.add_child(hb)
-
-	_grid_container = GridContainer.new()
-	_grid_container.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_grid_container.columns = 4
-	_grid_container.visible = false
-	hb.add_child(_grid_container)
-
+		
 	_btn_cancel = Button.new()
 	_btn_cancel.text = "Cancel"
 	_btn_cancel.pressed.connect(_on_cancel)
@@ -178,6 +182,8 @@ func _create_ui() -> void:
 
 	# apply theme to our panel (it cascades to children)
 	_panel.theme = theme
+	_grid_container.add_theme_font_override("font", Globals.FONT_KENNEY_FUTURE)
+	_label.add_theme_font_override("font", Globals.FONT_KENNEY_FUTURE)
 
 	# small spacing and margins polish
 	#vb.separation = 8
@@ -281,26 +287,34 @@ func show_stats(text: String, on_confirm: Callable) -> void:
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_grid_container.visible = true
 	
+	if _grid_container:
+		for child in _grid_container.get_children():
+			_grid_container.remove_child(child)
+	
 	var high_scores: Array = Gm.load_high_scores()
 
 	if high_scores:
 		var l1: Label = Label.new()
 		l1.text = "Time"
 		var l2: Label = Label.new()
-		l2.text = "Quanta Generated"
+		l2.text = "Q+"
 		var l3: Label = Label.new()
-		l3.text = "Quanta Spent"
+		l3.text = "Q-"
 		var l4: Label = Label.new()
-		l4.text = "Quanta per Second"
+		l4.text = "Q/s"
+		var l5: Label = Label.new()
+		l5.text = "Goal"
 
 		_grid_container.add_child(l1)
 		_grid_container.add_child(l2)
 		_grid_container.add_child(l3)
 		_grid_container.add_child(l4)
+		_grid_container.add_child(l5)
 		
 		high_scores.sort_custom(func(a, b): return a.elapsed_timer < b.elapsed_timer)
-		
-		for i in high_scores.size():
+		var limit = min(high_scores.size(), 10)
+
+		for i in range(limit):
 			var _l1: Label = Label.new()
 			_l1.text = Gm.format_time(high_scores[i].elapsed_timer)
 			var _l2: Label = Label.new()
@@ -309,11 +323,14 @@ func show_stats(text: String, on_confirm: Callable) -> void:
 			_l3.text = str(high_scores[i].player_quanta_spent)
 			var _l4: Label = Label.new()
 			_l4.text = str(high_scores[i].player_quanta_per_second)
+			var _l5: Label = Label.new()
+			_l5.text = str(high_scores[i].player_quanta_goal)
 
 			_grid_container.add_child(_l1)
 			_grid_container.add_child(_l2)
 			_grid_container.add_child(_l3)
 			_grid_container.add_child(_l4)
+			_grid_container.add_child(_l5)
 
 	# show overlay + panel and animate fade-in
 	_overlay.visible = true
