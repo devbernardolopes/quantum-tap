@@ -9,6 +9,7 @@ extends Control
 
 @onready var tap_sound: AudioStreamPlayer2D = $TapSound
 
+@onready var plain_background: ColorRect = $PlainBackground
 @onready var background: ColorRect = $Background
 
 @onready var quanta_label = $CurrencyDisplay/QuantaLabel
@@ -167,6 +168,10 @@ func _ready() -> void:
 	background_on_off.set_pressed_no_signal(!Gm.is_background_on)
 	audio_on_off.set_pressed_no_signal(!Gm.is_sound_on)
 	music_on_off.set_pressed_no_signal(!Gm.is_music_on)
+	if Gm.is_background_on:
+		background_on_off.modulate = Color.WHITE
+	else:
+		background_on_off.modulate = Color(Color.WHITE, 0.5)
 
 	beat_sync.beat_index = Gm.last_beat_index
 	audio_stream_player.play(Gm.music_last_position)

@@ -440,6 +440,16 @@ theme = ExtResource("6_0arob")
 ok_button_text = "Confirm"
 dialog_text = "Start a new game?"
 
+[node name="PlainBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.039215688, 0.039215688, 0.11764706, 1)
+metadata/_edit_lock_ = true
+
 [node name="Background" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_lwnsi")
 layout_mode = 1

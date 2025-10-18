@@ -381,7 +381,9 @@ func _on_quanta_per_second_timer_timeout() -> void:
 	if !is_game_paused:
 		if !has_reached_goal:
 			if quanta_per_second > 0:
-				quanta += int(quanta_per_second * multiplier) + get_random_entanglement_quanta()
+				var real_amount: int = int(quanta_per_second * multiplier) + get_random_entanglement_quanta()
+				quanta += real_amount
+				player_quanta_generated += real_amount
 
 func _on_elapsed_timer_timeout() -> void:
 	if !is_game_paused:
