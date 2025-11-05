@@ -10,4 +10,5 @@
 <p>Available for <strong>Windows</strong> and <strong>Android</strong>.</p>
 <h2><strong>❤️ Support the Developer</strong></h2>
 <p>This game is <strong>completely free</strong>. If you enjoy the experience, please consider leaving a small <em>donation</em> &mdash; your support helps me continue building experimental games like this one. Thank you for joining the Quantum journey!</p>
+<p>https://the-cokebear.itch.io/quantum-tap</p>
 <img width="702" height="800" alt="screenshot_1762354581" src="https://github.com/user-attachments/assets/dea9fa21-9267-4bb0-8f4d-d2d8f56f0c7e" />
