@@ -1,6 +1,31 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-/Exports/Android
-Exports/Windows/Quantum Tap (debug).pck
-Exports/Windows/Quantum Tap.exe
+
+# Godot-specific
+.import/
+export.cfg
+export_presets.cfg
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor-specific
+.vscode/
+.idea/
+
+# Build/Export folders
+build/
+bin/
+dist/
+exports/
+
+# Temporary or user files
+*.tmp
+*.log
+*.bak
+*.cfg~
+*.import
+*.uid

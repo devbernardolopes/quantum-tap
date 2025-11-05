@@ -420,7 +420,7 @@ func update_ui() -> void:
 	quantum_core_2d.position = quantum_core.position + (quantum_core.size / 2)
 	#character_video.position.x = quantum_core.position.x + (quantum_core.size.x / 2) - (character_video.size.x / 2)
 	circular_cascade_progress.position = quantum_core.position # + (quantum_core.size / 2)
-	stats_label.text = Gm.format_time(Gm.elapsed_timer) + " " + Gm.format_number(Gm.player_quanta_goal, " ")
+	stats_label.text = Gm.format_time(Gm.elapsed_timer) + "  GOAL: " + Gm.format_number(Gm.player_quanta_goal, " ")
 	quanta_label.text = Globals.QUANTA_LABEL_TEXT + "\n" + Gm.format_number(Gm.quanta, " ")
 	cascade_progress.value = Gm.cascade_progress
 	quanta_goal_progress.value = Gm.quanta
@@ -819,3 +819,9 @@ func update_menu_buttons():
 				else:
 					child.texture_disabled = child.texture_normal
 			child.disabled = Gm.is_game_paused
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.is_action("screenshot"):
+			Helpers.take_screenshot()
+			get_viewport().set_input_as_handled()
