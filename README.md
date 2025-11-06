@@ -1,14 +1,80 @@
-<h1><strong>Quantum Tap</strong></h1>
-<p><strong>Harness the infinite power of the Quantum Core.</strong> In <em>Quantum Tap</em>, every tap brings you closer to mastering the fabric of energy itself. Generate <strong>Quanta</strong> &mdash; the essence of pure power &mdash; and evolve your technology through groundbreaking upgrades as you journey toward the ultimate quantum singularity.</p>
-<h2><strong>⚛️ Gameplay Overview</strong></h2>
-<p>Tap (or click) on the <strong>Quantum Core</strong> to generate Quanta, then reinvest your energy into powerful upgrades to accelerate your progress. But beware &mdash; quantum instability grows as your energy expands, leading to unpredictable <em>Cascade Events</em> that can propel you into new dimensions of power.</p>
-<h2><strong>🔬 Key Features</strong></h2>
-<ul> <li><strong>Engaging clicker mechanics:</strong> Every tap generates Quanta &mdash; your vital energy currency.</li> <li><strong>Upgradeable technology:</strong> <ul> <li><strong>Particle Accelerator</strong> – boosts tap efficiency</li> <li><strong>Quantum Stabilizer</strong> – amplifies passive gains</li> <li><strong>Dimensional Shift</strong> – multiplies Quanta output</li> </ul> </li> <li><strong>Cascade Events:</strong> Trigger massive quantum breakthroughs and earn bonus energy as you transcend levels.</li> <li><strong>Dynamic progress display:</strong> A circular, pulsing progress bar synced to the beats of the cyberpunk soundtrack.</li> <li><strong>AI companion:</strong> Guided by <strong>Alix</strong>, a sharp-eyed scientist who appears with expressive animation and lip-synced dialogue during key moments.</li> </ul>
-<h2><strong>🎵 Atmosphere & Style</strong></h2>
-<p><em>Quantum Tap</em> merges sleek cyberpunk visuals with rhythmic music and reactive UI effects, creating a hypnotic flow of clicks, lights, and energy pulses as you push beyond the limits of science.</p>
-<h2><strong>💎 Platforms</strong></h2>
-<p>Available for <strong>Windows</strong> and <strong>Android</strong>.</p>
-<h2><strong>❤️ Support the Developer</strong></h2>
-<p>This game is <strong>completely free</strong>. If you enjoy the experience, please consider leaving a small <em>donation</em> &mdash; your support helps me continue building experimental games like this one. Thank you for joining the Quantum journey!</p>
-<p>https://the-cokebear.itch.io/quantum-tap</p>
-<img width="702" height="800" alt="screenshot_1762354581" src="https://github.com/user-attachments/assets/dea9fa21-9267-4bb0-8f4d-d2d8f56f0c7e" />
+# Quantum Tap
+
+**Quantum Tap** is a clicker/idle game developed using the Godot Engine (v4.5.1).  
+The player must harness the power of the **Quantum Core** by tapping (or clicking) to generate **Quanta**, the essential energy currency of the game.  
+Through upgrades, progression, and quantum breakthroughs, the goal is to reach the ultimate energy milestone and stabilize the fabric of reality itself.
+
+---
+
+## 🎮 Gameplay Overview
+
+Players generate Quanta by tapping the Quantum Core. This energy can then be invested into upgrades that enhance both active and passive production rates.  
+During gameplay, **Cascade Events** occur — powerful transitions between levels that grant bonus Quanta and push the game into new energy dimensions.
+
+---
+
+## 🔧 Core Features
+
+- **Progressive Clicker Mechanics** – Generate Quanta by tapping or clicking on the Quantum Core.  
+- **Upgradeable Systems:**  
+  - *Particle Accelerator* – boosts tap efficiency.  
+  - *Quantum Stabilizer* – amplifies passive energy gains.  
+  - *Dimensional Shift* – multiplies overall Quanta output.  
+- **Cascade Events** – trigger quantum breakthroughs with bonus Quanta rewards.  
+- **Animated UI Feedback** – circular progress bar synchronized with the music’s beat.  
+- **AI Companion** – guided by **Alix**, a sharp-eyed scientist with animated, lip-synced dialogue at key gameplay moments.  
+- **Cyberpunk-Themed Aesthetic** – immersive visuals and soundtrack designed for a futuristic, energetic atmosphere.
+
+---
+
+## 🧠 Objective
+
+Accumulate a target amount of Quanta to complete the current level and advance through successive quantum dimensions, each introducing new challenges and visual intensity.
+
+---
+
+## 💻 Platforms
+
+- **Windows**
+- **Android**
+
+---
+
+## 🧩 Technologies Used
+
+- **Engine:** Godot 4.5.1  
+- **Language:** GDScript  
+- **UI Design:** Godot Control Nodes  
+- **Audio:** Beat-synced dynamic feedback system  
+
+---
+
+## 🎥 Media
+
+Gameplay video available on YouTube:  
+[Watch Gameplay on YouTube](https://www.youtube.com/shorts/PYQJICFq2Lw)
+
+---
+
+## 🤝 Contributions
+
+Contributions, bug reports, and suggestions are welcome.  
+Please open an issue or submit a pull request if you wish to improve the project.
+
+---
+
+## 📜 License
+
+This project is released under the **MIT License**.  
+See the [LICENSE](LICENSE) file for details.
+
+---
+
+## ❤️ Support the Developer
+
+**Quantum Tap** is completely free to play.  
+If you enjoy the project and wish to support further development, please consider visiting my [Itch.io page](https://the-cokebear.itch.io/quantum-tap) and leaving a donation or feedback.
+
+---
+
+© 2025
