@@ -15,14 +15,14 @@ During gameplay, **Cascade Events** occur — powerful transitions between level
 
 ## 🔧 Core Features
 
-- **Progressive Clicker Mechanics** – Generate Quanta by tapping or clicking on the Quantum Core.  
-- **Upgradeable Systems:**  
-  - *Particle Accelerator* – boosts tap efficiency.  
-  - *Quantum Stabilizer* – amplifies passive energy gains.  
-  - *Dimensional Shift* – multiplies overall Quanta output.  
-- **Cascade Events** – trigger quantum breakthroughs with bonus Quanta rewards.  
-- **Animated UI Feedback** – circular progress bar synchronized with the music’s beat.  
-- **AI Companion** – guided by **Alix**, a sharp-eyed scientist with animated, lip-synced dialogue at key gameplay moments.  
+- **Progressive Clicker Mechanics** – Generate Quanta by tapping or clicking on the Quantum Core.
+- **Upgradeable Systems:**
+  - _Particle Accelerator_ – boosts tap efficiency.
+  - _Quantum Stabilizer_ – amplifies passive energy gains.
+  - _Dimensional Shift_ – multiplies overall Quanta output.
+- **Cascade Events** – trigger quantum breakthroughs with bonus Quanta rewards.
+- **Animated UI Feedback** – circular progress bar synchronized with the music’s beat.
+- **AI Companion** – guided by **Alix**, a sharp-eyed scientist with animated, lip-synced dialogue at key gameplay moments.
 - **Cyberpunk-Themed Aesthetic** – immersive visuals and soundtrack designed for a futuristic, energetic atmosphere.
 
 ---
@@ -42,10 +42,10 @@ Accumulate a target amount of Quanta to complete the current level and advance t
 
 ## 🧩 Technologies Used
 
-- **Engine:** Godot 4.5.1  
-- **Language:** GDScript  
-- **UI Design:** Godot Control Nodes  
-- **Audio:** Beat-synced dynamic feedback system  
+- **Engine:** Godot 4.5.1
+- **Language:** GDScript
+- **UI Design:** Godot Control Nodes
+- **Audio:** Beat-synced dynamic feedback system
 
 ---
 
@@ -63,16 +63,9 @@ Please open an issue or submit a pull request if you wish to improve the project
 
 ---
 
-## 📜 License
-
-This project is released under the **MIT License**.  
-See the [LICENSE](LICENSE) file for details.
-
----
-
 ## ❤️ Support the Developer
 
-**Quantum Tap** is completely free to play.  
+**Quantum Tap** is completely free to play and open source.  
 If you enjoy the project and wish to support further development, please consider visiting my [Itch.io page](https://the-cokebear.itch.io/quantum-tap) and leaving a donation or feedback.
 
 ---
