@@ -52,7 +52,7 @@ Accumulate a target amount of Quanta to complete the current level and advance t
 ## 🎥 Media
 
 Gameplay video available on YouTube:  
-[Watch Gameplay on YouTube](https://www.youtube.com/shorts/PYQJICFq2Lw)
+[Watch Gameplay on YouTube](https://www.youtube.com/shorts/J6i-w_NhPGM)
 
 ---
 
